@@ -1,17 +1,17 @@
 body {
-  padding: 20px;
+  margin: 0px !important;
 }
 #content {
   width: 100%;
 }
 .react-grid-layout {
   background: #eee;
-  margin-top: 10px;
+  /*margin-top: 10px;*/
 }
 .layoutJSON {
   background: #ddd;
   border: 1px solid black;
-  margin-top: 10px;
+  /*margin-top: 10px;*/
   padding: 10px;
 }
 .columns {

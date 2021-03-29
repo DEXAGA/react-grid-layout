@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "style-loader!css-loader!../css/styles.css";
 import "style-loader!css-loader!../examples/example-styles.css";
+
 typeof window !== "undefined" && (window.React = React); // for devtools
 
 export default function makeLayout(Layout) {
@@ -30,10 +31,6 @@ export default function makeLayout(Layout) {
       return (
         <React.StrictMode>
           <div>
-            <div className="layoutJSON">
-              Displayed as <code>[x, y, w, h]</code>:
-              <div className="columns">{this.stringifyLayout()}</div>
-            </div>
             <Layout onLayoutChange={this.onLayoutChange} />
           </div>
         </React.StrictMode>

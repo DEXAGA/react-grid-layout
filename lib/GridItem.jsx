@@ -1,45 +1,31 @@
 // @flow
-import React from "react";
+import classNames from "classnames";
 import PropTypes from "prop-types";
-import { DraggableCore } from "react-draggable";
-import { Resizable } from "react-resizable";
-import { fastPositionEqual, perc, setTopLeft, setTransform } from "./utils";
+import type {Element as ReactElement, Node as ReactNode} from "react";
+import React from "react";
+import {DraggableCore} from "react-draggable";
+import {Resizable} from "react-resizable";
+import type {PositionParams} from "./calculateUtils";
 import {
+  calcGridColWidth,
   calcGridItemPosition,
   calcGridItemWHPx,
-  calcGridColWidth,
-  calcXY,
+  calcGridRowHeight,
   calcWH,
+  calcXY,
   clamp
 } from "./calculateUtils";
-import {
-  resizeHandlesType,
-  resizeHandleType
-} from "./ReactGridLayoutPropTypes";
-import classNames from "classnames";
-import type { Element as ReactElement, Node as ReactNode } from "react";
-
-import type {
-  ReactDraggableCallbackData,
-  GridDragEvent,
-  GridResizeEvent,
-  DroppingPosition,
-  Position
-} from "./utils";
-
-import type { PositionParams } from "./calculateUtils";
-import type {
-  ResizeHandles,
-  ResizeHandle,
-  ReactRef
-} from "./ReactGridLayoutPropTypes";
+import type {ReactRef, ResizeHandle, ResizeHandles} from "./ReactGridLayoutPropTypes";
+import {resizeHandlesType, resizeHandleType} from "./ReactGridLayoutPropTypes";
+import type {DroppingPosition, GridDragEvent, GridResizeEvent, Position, ReactDraggableCallbackData} from "./utils";
+import {fastPositionEqual, perc, setTopLeft, setTransform} from "./utils";
 
 type PartialPosition = { top: number, left: number };
 type GridItemCallback<Data: GridDragEvent | GridResizeEvent> = (
-  i: string,
-  w: number,
-  h: number,
-  Data
+        i: string,
+        w: number,
+        h: number,
+        Data
 ) => void;
 
 type State = {
@@ -52,6 +38,7 @@ type Props = {
   children: ReactElement<any>,
   cols: number,
   containerWidth: number,
+  containerHeight: number,
   margin: [number, number],
   containerPadding: [number, number],
   rowHeight: number,
@@ -115,6 +102,7 @@ export default class GridItem extends React.Component<Props, State> {
     // General grid attributes
     cols: PropTypes.number.isRequired,
     containerWidth: PropTypes.number.isRequired,
+    containerHeight: PropTypes.number.isRequired,
     rowHeight: PropTypes.number.isRequired,
     margin: PropTypes.array.isRequired,
     maxRows: PropTypes.number.isRequired,
@@ -291,9 +279,11 @@ export default class GridItem extends React.Component<Props, State> {
       cols: props.cols,
       containerPadding: props.containerPadding,
       containerWidth: props.containerWidth,
+      containerHeight: props.containerHeight,
       margin: props.margin,
       maxRows: props.maxRows,
-      rowHeight: props.rowHeight
+      rowHeight: props.rowHeight,
+      // nbRow: bottom(this.state.layout),
     };
   }
 
@@ -473,7 +463,7 @@ export default class GridItem extends React.Component<Props, State> {
     let top = this.state.dragging.top + deltaY;
     let left = this.state.dragging.left + deltaX;
 
-    const { isBounded, i, w, h, containerWidth } = this.props;
+    const {isBounded, i, w, h, containerWidth, containerHeight} = this.props;
     const positionParams = this.getPositionParams();
 
     // Boundary calculations; keeps items within the grid
@@ -481,14 +471,15 @@ export default class GridItem extends React.Component<Props, State> {
       const { offsetParent } = node;
 
       if (offsetParent) {
-        const { margin, rowHeight } = this.props;
+        const {margin} = this.props;
+        const rowHeight = calcGridRowHeight(positionParams);
         const bottomBoundary =
-          offsetParent.clientHeight - calcGridItemWHPx(h, rowHeight, margin[1]);
+                containerHeight - calcGridItemWHPx(h, rowHeight, margin[1]);
         top = clamp(top, 0, bottomBoundary);
 
         const colWidth = calcGridColWidth(positionParams);
         const rightBoundary =
-          containerWidth - calcGridItemWHPx(w, colWidth, margin[0]);
+                containerWidth - calcGridItemWHPx(w, colWidth, margin[0]);
         left = clamp(left, 0, rightBoundary);
       }
     }
@@ -661,6 +652,8 @@ export default class GridItem extends React.Component<Props, State> {
     // Draggable support. This is always on, except for with placeholders.
     newChild = this.mixinDraggable(newChild, isDraggable);
 
+    // console.log(this.props, pos)
+    // console.log(this.props.i, pos)
     return newChild;
   }
 }

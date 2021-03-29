@@ -1,8 +1,26 @@
 // @flow
-import * as React from "react";
+import classNames from "classnames";
 
 import isEqual from "lodash.isequal";
-import classNames from "classnames";
+import type {ChildrenArray as ReactChildrenArray, Element as ReactElement} from "react";
+import * as React from "react";
+
+import type {PositionParams} from "./calculateUtils";
+import {calcXY} from "./calculateUtils";
+
+import GridItem from "./GridItem";
+import type {DefaultProps, Props} from "./ReactGridLayoutPropTypes";
+import ReactGridLayoutPropTypes from "./ReactGridLayoutPropTypes";
+// Types
+import type {
+  CompactType,
+  DragOverEvent,
+  DroppingPosition,
+  GridDragEvent,
+  GridResizeEvent,
+  Layout,
+  LayoutItem
+} from "./utils";
 import {
   autoBindHandlers,
   bottom,
@@ -19,28 +37,6 @@ import {
   withLayoutItem
 } from "./utils";
 
-import { calcXY } from "./calculateUtils";
-
-import GridItem from "./GridItem";
-import ReactGridLayoutPropTypes from "./ReactGridLayoutPropTypes";
-import type {
-  ChildrenArray as ReactChildrenArray,
-  Element as ReactElement
-} from "react";
-
-// Types
-import type {
-  CompactType,
-  GridResizeEvent,
-  GridDragEvent,
-  DragOverEvent,
-  Layout,
-  DroppingPosition,
-  LayoutItem
-} from "./utils";
-
-import type { PositionParams } from "./calculateUtils";
-
 type State = {
   activeDrag: ?LayoutItem,
   layout: Layout,
@@ -55,8 +51,6 @@ type State = {
   compactType?: CompactType,
   propsLayout?: Layout
 };
-
-import type { Props, DefaultProps } from "./ReactGridLayoutPropTypes";
 
 // End Types
 
@@ -230,15 +224,11 @@ export default class ReactGridLayout extends React.Component<Props, State> {
   containerHeight(): ?string {
     if (!this.props.autoSize) return;
     const nbRow = bottom(this.state.layout);
-    const containerPaddingY = this.props.containerPadding
-      ? this.props.containerPadding[1]
-      : this.props.margin[1];
-    return (
-      nbRow * this.props.rowHeight +
-      (nbRow - 1) * this.props.margin[1] +
-      containerPaddingY * 2 +
-      "px"
-    );
+    const height = nbRow * this.props.rowHeight +
+            this.props.margin[1] +
+            this.props.containerPadding[1] +
+            "px";
+    return height;
   }
 
   /**
@@ -473,6 +463,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
     if (!activeDrag) return null;
     const {
       width,
+      height,
       cols,
       margin,
       containerPadding,
@@ -485,23 +476,24 @@ export default class ReactGridLayout extends React.Component<Props, State> {
     // {...this.state.activeDrag} is pretty slow, actually
     return (
       <GridItem
-        w={activeDrag.w}
-        h={activeDrag.h}
-        x={activeDrag.x}
-        y={activeDrag.y}
-        i={activeDrag.i}
-        className="react-grid-placeholder"
-        containerWidth={width}
-        cols={cols}
-        margin={margin}
-        containerPadding={containerPadding || margin}
-        maxRows={maxRows}
-        rowHeight={rowHeight}
-        isDraggable={false}
-        isResizable={false}
-        isBounded={false}
-        useCSSTransforms={useCSSTransforms}
-        transformScale={transformScale}
+              w={activeDrag.w}
+              h={activeDrag.h}
+              x={activeDrag.x}
+              y={activeDrag.y}
+              i={activeDrag.i}
+              className="react-grid-placeholder"
+              containerWidth={width}
+              containerHeight={height}
+              cols={cols}
+              margin={margin}
+              containerPadding={containerPadding || margin}
+              maxRows={maxRows}
+              rowHeight={rowHeight}
+              isDraggable={false}
+              isResizable={false}
+              isBounded={false}
+              useCSSTransforms={useCSSTransforms}
+              transformScale={transformScale}
       >
         <div />
       </GridItem>
@@ -522,6 +514,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
     if (!l) return null;
     const {
       width,
+      height,
       cols,
       margin,
       containerPadding,
@@ -557,39 +550,40 @@ export default class ReactGridLayout extends React.Component<Props, State> {
 
     return (
       <GridItem
-        containerWidth={width}
-        cols={cols}
-        margin={margin}
-        containerPadding={containerPadding || margin}
-        maxRows={maxRows}
-        rowHeight={rowHeight}
-        cancel={draggableCancel}
-        handle={draggableHandle}
-        onDragStop={this.onDragStop}
-        onDragStart={this.onDragStart}
-        onDrag={this.onDrag}
-        onResizeStart={this.onResizeStart}
-        onResize={this.onResize}
-        onResizeStop={this.onResizeStop}
-        isDraggable={draggable}
-        isResizable={resizable}
-        isBounded={bounded}
-        useCSSTransforms={useCSSTransforms && mounted}
-        usePercentages={!mounted}
-        transformScale={transformScale}
-        w={l.w}
-        h={l.h}
-        x={l.x}
-        y={l.y}
-        i={l.i}
-        minH={l.minH}
-        minW={l.minW}
-        maxH={l.maxH}
-        maxW={l.maxW}
-        static={l.static}
-        droppingPosition={isDroppingItem ? droppingPosition : undefined}
-        resizeHandles={resizeHandlesOptions}
-        resizeHandle={resizeHandle}
+              containerWidth={width}
+              containerHeight={height}
+              cols={cols}
+              margin={margin}
+              containerPadding={containerPadding || margin}
+              maxRows={maxRows}
+              rowHeight={rowHeight}
+              cancel={draggableCancel}
+              handle={draggableHandle}
+              onDragStop={this.onDragStop}
+              onDragStart={this.onDragStart}
+              onDrag={this.onDrag}
+              onResizeStart={this.onResizeStart}
+              onResize={this.onResize}
+              onResizeStop={this.onResizeStop}
+              isDraggable={draggable}
+              isResizable={resizable}
+              isBounded={bounded}
+              useCSSTransforms={useCSSTransforms && mounted}
+              usePercentages={!mounted}
+              transformScale={transformScale}
+              w={l.w}
+              h={l.h}
+              x={l.x}
+              y={l.y}
+              i={l.i}
+              minH={l.minH}
+              minW={l.minW}
+              maxH={l.maxH}
+              maxW={l.maxW}
+              static={l.static}
+              droppingPosition={isDroppingItem ? droppingPosition : undefined}
+              resizeHandles={resizeHandlesOptions}
+              resizeHandle={resizeHandle}
       >
         {child}
       </GridItem>
@@ -619,6 +613,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
       rowHeight,
       maxRows,
       width,
+      height,
       containerPadding
     } = this.props;
     const { layout } = this.state;
@@ -633,6 +628,7 @@ export default class ReactGridLayout extends React.Component<Props, State> {
         maxRows,
         rowHeight,
         containerWidth: width,
+        containerHeight: height,
         containerPadding: containerPadding || margin
       };
 
@@ -718,24 +714,27 @@ export default class ReactGridLayout extends React.Component<Props, State> {
     this.props.onDrop(layout, item, e);
   };
 
-  render(): React.Element<"div"> {
-    const { className, style, isDroppable, innerRef } = this.props;
+  render() {
+    const {className, style, isDroppable, innerRef} = this.props;
 
     const mergedClassName = classNames(layoutClassName, className);
     const mergedStyle = {
       height: this.containerHeight(),
+      // height: !this.props.autoSize ? this.props.height : undefined,
       ...style
     };
 
+    // console.log(this.props.height)
+
     return (
-      <div
-        ref={innerRef}
-        className={mergedClassName}
-        style={mergedStyle}
-        onDrop={isDroppable ? this.onDrop : noop}
-        onDragLeave={isDroppable ? this.onDragLeave : noop}
-        onDragEnter={isDroppable ? this.onDragEnter : noop}
-        onDragOver={isDroppable ? this.onDragOver : noop}
+            <div
+                    ref={innerRef}
+                    className={mergedClassName}
+                    style={mergedStyle}
+                    onDrop={isDroppable ? this.onDrop : noop}
+                    onDragLeave={isDroppable ? this.onDragLeave : noop}
+                    onDragEnter={isDroppable ? this.onDragEnter : noop}
+                    onDragOver={isDroppable ? this.onDragOver : noop}
       >
         {React.Children.map(this.props.children, child =>
           this.processGridItem(child)

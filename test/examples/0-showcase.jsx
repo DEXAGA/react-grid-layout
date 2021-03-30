@@ -177,7 +177,9 @@ const ShowcaseLayout = (props: {
   };
 
   // console.log(state.layouts)
+  const paddingX = 10;
   const paddingY = 10;
+  const marginX = 10;
   const marginY = 10;
   return (
           <div style={{
@@ -202,8 +204,10 @@ const ShowcaseLayout = (props: {
                               compactType={state.compactType}
                               preventCollision={!state.compactType}
                               autoSize={true}
-                              containerPadding={[10, paddingY]}
-                              margin={[10, marginY]}
+                              // containerPadding={[10, paddingY]}
+                              // margin={[10, marginY]}
+                              containerPadding={[paddingX, paddingY]}
+                              margin={[marginX, marginY]}
                               rowHeight={state.height / 12 - marginY / 12 - paddingY / 12}
                               height={state.height}
                       >

@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="App">
       <ShowcaseLayout/>
-      <BasicLayout/>
+      {/*<BasicLayout/>*/}
       {/*<NoDraggingLayout/>*/}
       {/*<MessyLayout/>*/}
       {/*<GridPropertyLayout/>*/}

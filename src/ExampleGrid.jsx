@@ -1,7 +1,7 @@
 // @flow
 import _ from "lodash";
 import * as React from "react";
-import {WidthProvider, Responsive} from './react-grid-layout';
+import {Responsive, WidthProvider} from './react-grid-layout';
 import type {Layout, LayoutItem} from './react-grid-layout/lib/utils';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -49,6 +49,12 @@ const ShowcaseLayout = (props: {
   React.useEffect(() => {
     window.addEventListener("resize", onWindowResize);
     onWindowResize();
+    return () => {
+      window.removeEventListener("resize", onWindowResize);
+    }
+  }, [])
+
+  React.useEffect(() => {
     setState(prevState => ({
       ...prevState,
       layouts: {
@@ -133,7 +139,6 @@ const ShowcaseLayout = (props: {
         ...prevState,
         mounted: false,
       }))
-      window.removeEventListener("resize", onWindowResize);
     }
   }, [])
 

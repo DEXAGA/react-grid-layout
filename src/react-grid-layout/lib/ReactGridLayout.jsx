@@ -418,7 +418,7 @@ const ReactGridLayout = (props) => {
                     containerHeight={props.height}
                     cols={props.cols}
                     margin={props.margin}
-                    containerPadding={props.containerPadding || props.margin}
+                    containerPadding={props.margin}
                     maxRows={props.maxRows}
                     rowHeight={props.rowHeight}
                     isDraggable={false}
@@ -468,7 +468,7 @@ const ReactGridLayout = (props) => {
                     containerHeight={props.height}
                     cols={props.cols}
                     margin={props.margin}
-                    containerPadding={props.containerPadding || props.margin}
+                    containerPadding={props.margin}
                     maxRows={props.maxRows}
                     rowHeight={props.rowHeight}
                     cancel={props.draggableCancel}
@@ -533,7 +533,7 @@ const ReactGridLayout = (props) => {
         rowHeight: props.rowHeight,
         containerWidth: props.width,
         containerHeight: props.height,
-        containerPadding: props.containerPadding || props.margin
+        containerPadding: props.margin
       };
 
       const calculatedPosition = calcXY(
@@ -627,10 +627,10 @@ const ReactGridLayout = (props) => {
     if (!props.autoSize) return;
     const nbRow = bottom(state.layout);
     const height = nbRow * props.rowHeight +
-            props.margin[1] +
-            props.containerPadding[1] +
-            "px";
-    return height;
+              props.margin[1] +
+              props.containerPadding[1] +
+              "px";
+    return height !== undefined && height !== null && height !== 0 ? height : props.height;
   }
 
   // console.log(props.height)
@@ -667,7 +667,8 @@ ReactGridLayout.defaultProps = {
   style: {},
   draggableHandle: "",
   draggableCancel: "",
-  containerPadding: [0, 0],
+  containerPadding: [10, 10],
+  height: 300,
   rowHeight: 150,
   maxRows: Infinity, // infinite vertical growth
   layout: [],

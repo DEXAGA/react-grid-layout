@@ -15,7 +15,7 @@ export default class StaticElementsLayout extends React.PureComponent {
   }
 
   onLayoutChange(layout) {
-    this.props.onLayoutChange(layout);
+    // this.props.onLayoutChange(layout);
   }
 
   render() {

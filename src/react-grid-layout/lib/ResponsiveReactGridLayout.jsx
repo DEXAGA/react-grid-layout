@@ -39,52 +39,6 @@ function getIndentationValue<T: ?[number, number]>(
   // $FlowIgnore TODO fix this typedef
   return Array.isArray(param) ? param : param[breakpoint];
 }
-
-type State = {
-  layout: Layout,
-  breakpoint: string,
-  cols: number,
-  layouts?: ResponsiveLayout<string>
-};
-
-type Props<Breakpoint: string = string> = {|
-  ...React.ElementConfig<typeof ReactGridLayout>,
-
-  // Responsive config
-  breakpoint?: ?Breakpoint,
-  breakpoints: Breakpoints<Breakpoint>,
-  cols: { [key: Breakpoint]: number },
-  layouts: ResponsiveLayout<Breakpoint>,
-  width: number,
-  margin: { [key: Breakpoint]: [number, number] } | [number, number],
-  /* prettier-ignore */
-  containerPadding: { [key: Breakpoint]: ?[number, number] } | ?[number, number],
-
-  // Callbacks
-  onBreakpointChange: (Breakpoint, cols: number) => void,
-  onLayoutChange: OnLayoutChangeCallback,
-  onWidthChange: (
-    containerWidth: number,
-    margin: [number, number],
-    cols: number,
-    containerPadding: ?[number, number]
-  ) => void
-|};
-
-type DefaultProps = Pick<
-  Props<>,
-  {|
-    breakpoints: 0,
-    cols: 0,
-    containerPadding: 0,
-    layouts: 0,
-    margin: 0,
-    onBreakpointChange: 0,
-    onLayoutChange: 0,
-    onWidthChange: 0
-  |}
->;
-
 export default class ResponsiveReactGridLayout extends React.Component<
   Props<>,
   State
@@ -159,7 +113,7 @@ export default class ResponsiveReactGridLayout extends React.Component<
   static defaultProps: DefaultProps = {
     breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
     cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
-    containerPadding: { lg: null, md: null, sm: null, xs: null, xxs: null },
+    containerPadding: [10, 10],
     layouts: {},
     margin: [10, 10],
     onBreakpointChange: noop,

@@ -2,8 +2,8 @@
   "root": true,
   "parser": "babel-eslint",
   "plugins": [
-    "react",
-    "flowtype"
+//    "react",
+//    "flowtype"
   ],
   "extends": [
 //    "eslint:recommended",
@@ -11,16 +11,16 @@
 //    "plugin:flowtype/recommended"
   ],
   "rules": {
-    "react/prop-types": 0,
-    "no-console": 0,
-    "no-use-before-define": [2, "nofunc"],
-    "no-unused-vars": [1, {
-      "argsIgnorePattern": "^(e|_.*)$",
-      "vars": "local",
-      "varsIgnorePattern": "(debug|^_)"
-    }],
-    "prefer-const": 2,
-    "react/jsx-boolean-value": [2, "always"]
+//    "react/prop-types": 0,
+//    "no-console": 0,
+//    "no-use-before-define": [2, "nofunc"],
+//    "no-unused-vars": [1, {
+//      "argsIgnorePattern": "^(e|_.*)$",
+//      "vars": "local",
+//      "varsIgnorePattern": "(debug|^_)"
+//    }],
+//    "prefer-const": 2
+//    "react/jsx-boolean-value": [2, "always"]
   },
   "env": {
     "browser": true,

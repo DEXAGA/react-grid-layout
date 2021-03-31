@@ -1,29 +1,42 @@
 import React from "react";
 import './App.css';
-import ShowcaseLayout from "./react-grid-layout/examples/0-showcase";
-import BasicLayout from "./react-grid-layout/examples/1-basic";
-import DynamicMinMaxLayout from "./react-grid-layout/examples/10-dynamic-min-max-wh";
-import NoCompactingLayout from "./react-grid-layout/examples/11-no-vertical-compact";
-import NoCollisionLayout from "./react-grid-layout/examples/12-prevent-collision";
-import ErrorCaseLayout from "./react-grid-layout/examples/13-error-case";
-import ToolboxLayout from "./react-grid-layout/examples/14-toolbox";
-import DragFromOutsideLayout from "./react-grid-layout/examples/15-drag-from-outside";
-import BoundedLayout from "./react-grid-layout/examples/16-bounded";
-import ResizableHandles from "./react-grid-layout/examples/17-resizable-handles";
-import BootstrapStyleLayout from "./react-grid-layout/examples/17-responsive-bootstrap-style";
-import ScaledLayout from "./react-grid-layout/examples/18-scale";
-import NoDraggingLayout from "./react-grid-layout/examples/2-no-dragging";
-import MessyLayout from "./react-grid-layout/examples/3-messy";
-import GridPropertyLayout from "./react-grid-layout/examples/4-grid-property";
-import StaticElementsLayout from "./react-grid-layout/examples/5-static-elements";
-import LocalStorageLayout from "./react-grid-layout/examples/7-localstorage";
-import ResponsiveLocalStorageLayout from "./react-grid-layout/examples/8-localstorage-responsive";
-import MinMaxLayout from "./react-grid-layout/examples/9-min-max-wh";
+import ShowcaseLayout from "./stories/0-showcase";
+import BasicLayout from "./stories/1-basic";
+import DynamicMinMaxLayout from "./stories/10-dynamic-min-max-wh";
+import NoCompactingLayout from "./stories/11-no-vertical-compact";
+import NoCollisionLayout from "./stories/12-prevent-collision";
+import ErrorCaseLayout from "./stories/13-error-case";
+import ToolboxLayout from "./stories/14-toolbox";
+import DragFromOutsideLayout from "./stories/15-drag-from-outside";
+import BoundedLayout from "./stories/16-bounded";
+import ResizableHandles from "./stories/17-resizable-handles";
+import BootstrapStyleLayout from "./stories/17-responsive-bootstrap-style";
+import ScaledLayout from "./stories/18-scale";
+import NoDraggingLayout from "./stories/2-no-dragging";
+import MessyLayout from "./stories/3-messy";
+import GridPropertyLayout from "./stories/4-grid-property";
+import StaticElementsLayout from "./stories/5-static-elements";
+import LocalStorageLayout from "./stories/7-localstorage";
+import ResponsiveLocalStorageLayout from "./stories/8-localstorage-responsive";
+import MinMaxLayout from "./stories/9-min-max-wh";
 
 function App() {
   return (
     <div className="App">
-      <ShowcaseLayout/>
+      <div className={"App-header"}>
+        {"See storybook for examples by running the following in your terminal:"}
+        <br/>
+        <br/>
+        <br/>
+        {"yarn storybook"}
+        <br/>
+        <br/>
+        {"OR"}
+        <br/>
+        <br/>
+        {"npm run storybook"}
+      </div>
+      {/*<ShowcaseLayout/>*/}
       {/*<BasicLayout/>*/}
       {/*<NoDraggingLayout/>*/}
       {/*<MessyLayout/>*/}

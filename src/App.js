@@ -10,7 +10,6 @@ import ToolboxLayout from "./stories/14-toolbox";
 import DragFromOutsideLayout from "./stories/15-drag-from-outside";
 import BoundedLayout from "./stories/16-bounded";
 import ResizableHandles from "./stories/17-resizable-handles";
-import BootstrapStyleLayout from "./stories/17-responsive-bootstrap-style";
 import ScaledLayout from "./stories/18-scale";
 import NoDraggingLayout from "./stories/2-no-dragging";
 import MessyLayout from "./stories/3-messy";
@@ -21,43 +20,55 @@ import LocalStorageLayout from "./stories/7-localstorage";
 import ResponsiveLocalStorageLayout from "./stories/8-localstorage-responsive";
 import MinMaxLayout from "./stories/9-min-max-wh";
 
+function Divider() {
+  return <hr style={{
+    width: '100%',
+    height: 5,
+  }}/>;
+}
+
 function App() {
   return (
-    <div className="App">
-      <div className={"App-header"}>
-        {"See storybook for examples by running the following in your terminal:"}
-        <br/>
-        <br/>
-        <br/>
-        {"yarn storybook"}
-        <br/>
-        <br/>
-        {"OR"}
-        <br/>
-        <br/>
-        {"npm run storybook"}
-      </div>
-      {/*<ShowcaseLayout/>*/}
-      {/*<BasicLayout/>*/}
-      {/*<NoDraggingLayout/>*/}
-      {/*<MessyLayout/>*/}
-      {/*<GridPropertyLayout/>*/}
-      {/*<StaticElementsLayout/>*/}
-      {/*<DynamicMinMaxLayout/>*/}
-      {/*<LocalStorageLayout/>*/}
-      {/*<ResponsiveLocalStorageLayout/>*/}
-      {/*<MinMaxLayout/>*/}
-      {/*<AddRemoveLayout/>*/}
-      {/*<NoCompactingLayout/>*/}
-      {/*<NoCollisionLayout/>*/}
-      {/*<ErrorCaseLayout/>*/}
-      <ToolboxLayout/>
-      {/*<DragFromOutsideLayout/>*/}
-      {/*<BoundedLayout/>*/}
-      {/*<ResizableHandles/>*/}
-      {/*<BootstrapStyleLayout/>*/}
-      {/*<ScaledLayout/>*/}
-    </div>
+          <div className="App">
+            <div className={"App-header"}>
+              {"See storybook for examples by running the following in your terminal:"}
+              <br/>
+              <br/>
+              <br/>
+              {"yarn storybook"}
+              <br/>
+              <br/>
+              {"OR"}
+              <br/>
+              <br/>
+              {"npm run storybook"}
+            </div>
+            <div style={{
+              display: `grid`,
+              gap: 100
+            }}>
+              <ShowcaseLayout/>
+              <BasicLayout/>
+              <NoDraggingLayout/>
+              <MessyLayout/>
+              <GridPropertyLayout/>
+              <StaticElementsLayout/>
+              <DynamicMinMaxLayout/>
+              <LocalStorageLayout/>
+              <ResponsiveLocalStorageLayout/>
+              <MinMaxLayout/>
+              <AddRemoveLayout/>
+              <NoCompactingLayout/>
+              <NoCollisionLayout/>
+              <ErrorCaseLayout/>
+              <ToolboxLayout/>
+              <DragFromOutsideLayout/>
+              <BoundedLayout/>
+              <ResizableHandles/>
+              {/*<BootstrapStyleLayout/>*/}
+              <ScaledLayout/>
+            </div>
+          </div>
   );
 }
 

@@ -39,13 +39,13 @@ Here's my attempt at reviving community engagement on the project and giving it 
 
 ## TODO List:
 
-- [ ] Finish migrating remaining components to Hooks
-- [ ] Migrate Flow to Typescript
-- [ ] Fix the rest of the examples.
-- [ ] Create a Storybook with the examples in it.
-- [ ] Transition away from HOC width provider
-- [ ] Create new npm package.
-- [ ] Create a codesandbox for main showcase.
+- [x] Create a Storybook with the examples in it.
+- [ ] Remove Flow to Typescript
+- [ ] Finish migrating remaining components/examples to Hooks
+- [ ] Manually read typescript using old flow types as a reference (not a bit project)
+- [ ] Transition away from HOC Width/Height provider
+- [ ] Create new npm package for distribution.
+- [ ] Create a codesandbox for main showcase and issue replication.
 - [ ] Redo basic tests.
 - [ ] Redo CI Workflows.
 
@@ -461,7 +461,21 @@ Because the `children` prop doesn't change between rerenders, updates to `<MyGri
 
 ## Contribute
 
+Clone the project:
+
+```git clone git@github.com:DEXAGA/react-grid-layout-hooks.git```
+
+Run the storybook to see examples
+
+```yarn storybook```
+
+Start create-react-app to fiddle with components. The hot reloader and error handler is MUCH better in this build than in the storybook
+
+```yarn start```
+
 If you have a feature request, please add it as an issue or make a pull request.
 
 If you have a bug to report, please reproduce the bug in a codesandbox to help
 others easily isolate it.
+
+Feature requests are much appreciated and if you could reproduce errors in a codesandbox, that would be awesome!

@@ -1,72 +1,67 @@
-import React from "react";
 import _ from "lodash";
-import RGL, { WidthProvider } from "../react-grid-layout";
+import React from "react";
+import RGL, {WidthProvider} from "../react-grid-layout";
 
 const ReactGridLayout = WidthProvider(RGL);
 
-export default class BasicLayout extends React.PureComponent {
-  static defaultProps = {
-    className: "layout",
-    items: 20,
-    rowHeight: 30,
-    onLayoutChange: function() {},
-    cols: 12
-  };
+const BasicLayout = (props) => {
 
-  constructor(props) {
-    super(props);
+  const [state, setState] = React.useState()
 
-    const layout = this.generateLayout();
-    this.state = {
-      layout
-    };
-  }
+  React.useEffect(() => {
+    setState({
+      layout: _.map(new Array(props.items), function(item, i) {
+        const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
+        return {
+          x: (i * 2) % 12,
+          y: Math.floor(i / 6) * y,
+          w: 2,
+          h: y,
+          i: i.toString()
+        };
+      })
+    })
+  }, [])
 
-  generateDOM() {
-    return _.map(_.range(this.props.items), function(i) {
-      return (
-        <div key={i}>
-          <span className="text">{i}</span>
-        </div>
-      );
-    });
-  }
-
-  generateLayout() {
-    const p = this.props;
-    return _.map(new Array(p.items), function(item, i) {
-      const y = _.result(p, "y") || Math.ceil(Math.random() * 4) + 1;
-      return {
-        x: (i * 2) % 12,
-        y: Math.floor(i / 6) * y,
-        w: 2,
-        h: y,
-        i: i.toString()
-      };
-    });
-  }
-
-  onLayoutChange(layout) {
-    this.props.onLayoutChange(layout);
-  }
-
-  render() {
-    const paddingX = 10;
-    const paddingY = 10;
-    const marginX = 10;
-    const marginY = 10;
-    return (
-      <ReactGridLayout
-        layout={this.state.layout}
-        onLayoutChange={this.onLayoutChange}
-        {...this.props}
-        containerPadding={[paddingX, paddingY]}
-        margin={[marginX, marginY]}
-        rowHeight={this.state.height / 12 - marginY / 12 - paddingY / 12}
-      >
-        {this.generateDOM()}
-      </ReactGridLayout>
-    );
-  }
+  const paddingX = 10;
+  const paddingY = 10;
+  const marginX = 10;
+  const marginY = 10;
+  return (
+          <div style={{
+            height: `100%`
+          }}>
+            {state?.layout && (
+                    <ReactGridLayout
+                            layout={state.layout}
+                            onLayoutChange={(layout) => {
+                              props.onLayoutChange(layout);
+                            }}
+                            {...props}
+                            containerPadding={[paddingX, paddingY]}
+                            margin={[marginX, marginY]}
+                            rowHeight={state.height / 12 - marginY / 12 - paddingY / 12}
+                    >
+                      {_.map(_.range(props.items), function(i) {
+                        return (
+                                <div key={i}>
+                                  <span className="text">{i}</span>
+                                </div>
+                        );
+                      })}
+                    </ReactGridLayout>
+            )}
+          </div>
+  );
 }
 
+BasicLayout.defaultProps = {
+  className: "layout",
+  items: 20,
+  rowHeight: 30,
+  onLayoutChange: function() {
+  },
+  cols: 12
+};
+
+export default BasicLayout

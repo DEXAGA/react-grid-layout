@@ -1,4 +1,4 @@
-// @flow
+
 import type {Position} from "./utils";
 
 export type PositionParams = {
@@ -12,7 +12,12 @@ export type PositionParams = {
 
 // Helper for generating column width
 export function calcGridColWidth(positionParams: PositionParams): number {
-  const {margin, containerPadding, containerWidth, cols} = positionParams;
+  const {
+    margin,
+    containerPadding,
+  // @ts-ignore
+    containerWidth,
+    cols}: PositionParams = positionParams;
   return (
           (containerWidth - margin[0] * (cols - 1) - containerPadding[0] * 2) / cols
   );
@@ -57,15 +62,16 @@ export function calcGridItemPosition(
   y: number,
   w: number,
   h: number,
-  state: ?Object
-): Position {
+  state: { resizing: any; dragging: any; className?: string; }
+)  {
   const {margin, containerPadding} = positionParams;
   const colWidth = calcGridColWidth(positionParams);
   const rowHeight = calcGridRowHeight(positionParams);
-  const out = {};
+  const out: Record<any,any> = {};
 
   // If resizing, use the exact width and height as returned from resizing callbacks.
   if (state && state.resizing) {
+
     out.width = Math.round(state.resizing.width);
     out.height = Math.round(state.resizing.height);
   }

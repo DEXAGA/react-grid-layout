@@ -33,13 +33,13 @@ import {
 } from "./utils";
 
 type State = {
-  activeDrag: ?LayoutItem,
+  activeDrag:  LayoutItem,
   layout: Layout,
   mounted: boolean,
-  oldDragItem: ?LayoutItem,
-  oldLayout: ?Layout,
-  oldResizeItem: ?LayoutItem,
-  droppingDOMNode: ?ReactElement<any>,
+  oldDragItem:  LayoutItem,
+  oldLayout:  Layout,
+  oldResizeItem:  LayoutItem,
+  droppingDOMNode:  ReactElement<any>,
   droppingPosition?: DroppingPosition,
   // Mirrored props
   children: ReactChildrenArray<ReactElement<any>>,
@@ -89,7 +89,7 @@ const ReactGridLayout = (props) => {
 
   const dragEnterCounter = 0;
 
-  const onLayoutMaybeChanged = (newLayout: Layout, oldLayout: ?Layout) => {
+  const onLayoutMaybeChanged = (newLayout: Layout, oldLayout:  Layout) => {
     if (!oldLayout) oldLayout = state.layout;
 
     if (!isEqual(oldLayout, newLayout)) {
@@ -401,7 +401,7 @@ const ReactGridLayout = (props) => {
    * Create a placeholder object.
    * @return {Element} Placeholder div.
    */
-  const placeholder = (): ?ReactElement<any> => {
+  const placeholder = ():  ReactElement<any> => {
     const {activeDrag} = state;
     if (!activeDrag) return null;
 
@@ -438,9 +438,9 @@ const ReactGridLayout = (props) => {
    * @return {Element}       Element wrapped in draggable and properly placed.
    */
   const processGridItem = (
-          child: ReactElement<any>,
-          isDroppingItem?: boolean
-  ): ?ReactElement<any> => {
+          child ,
+          isDroppingItem
+  )  => {
     if (!child || !child.key) return;
     const l = getLayoutItem(state.layout, String(child.key));
     if (!l) return null;
@@ -506,7 +506,7 @@ const ReactGridLayout = (props) => {
 
   // Called while dragging an element. Part of browser native drag/drop API.
   // Native event target might be the layout itself, or an element within the layout.
-  const onDragOver: DragOverEvent => void | false = (e) => {
+  const onDragOver  = (e) => {
     // we should ignore events from layout's children in Firefox
     // to avoid unpredictable jumping of a dropping placeholder
     // FIXME remove this hack
@@ -607,7 +607,7 @@ const ReactGridLayout = (props) => {
     dragEnterCounter++;
   };
 
-  const onDrop: EventHandler = (e: Event) => {
+  const onDrop  = (e: Event) => {
     const item = state.layout.find(l => l.i === props.droppingItem.i);
 
     // reset dragEnter counter on drop
@@ -623,7 +623,7 @@ const ReactGridLayout = (props) => {
    * Calculates a pixel value for the container.
    * @return {String} Container height in pixels.
    */
-  const containerHeight = (): ?string => {
+  const containerHeight = ()  => {
     if (!props.autoSize) return;
     const nbRow = bottom(state.layout);
     const height = nbRow * props.rowHeight +

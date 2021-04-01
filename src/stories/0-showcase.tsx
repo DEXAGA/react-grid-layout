@@ -172,7 +172,7 @@ const ShowcaseLayout = (props: {
     );
   };
 
-  const onDrop: (layout: Layout, item: ?LayoutItem, e: Event) => void = (elemParams) => {
+  const onDrop: (layout: Layout, item:  LayoutItem, e: Event) => void = (elemParams) => {
     alert(`Element parameters: ${JSON.stringify(elemParams)}`);
   };
 

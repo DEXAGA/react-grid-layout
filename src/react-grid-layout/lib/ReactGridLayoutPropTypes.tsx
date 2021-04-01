@@ -14,10 +14,7 @@ export type ResizeHandle =
   | ReactElement<any>
   | ((resizeHandleAxis: ResizeHandleAxis) => ReactElement<any>);
 
-// util
-export type ReactRef<T: HTMLElement> = {|
-  +current: T | null
-|};
+
 
 // Defines which resize handles should be rendered (default: 'se')
 // Allows for any combination of:
@@ -29,15 +26,15 @@ export type ReactRef<T: HTMLElement> = {|
 // 'nw' - Northwest handle (top-left)
 // 'se' - Southeast handle (bottom-right)
 // 'ne' - Northeast handle (top-right)
-export const resizeHandlesType: ReactPropsChainableTypeChecker = PropTypes.arrayOf(
+export const resizeHandlesType = PropTypes.arrayOf(
   PropTypes.oneOf(["s", "w", "e", "n", "sw", "nw", "se", "ne"])
 );
 // Custom component for resize handles
-export const resizeHandleType: ReactPropsChainableTypeChecker = PropTypes.oneOfType(
+export const resizeHandleType  = PropTypes.oneOfType(
   [PropTypes.node, PropTypes.func]
 );
 
-export type Props = {|
+export type Props = {
   className: string,
   style: Object,
   width: number,
@@ -59,30 +56,24 @@ export type Props = {|
   preventCollision: boolean,
   useCSSTransforms: boolean,
   transformScale: number,
-  droppingItem: $Shape<LayoutItem>,
+  droppingItem ,
   resizeHandles: ResizeHandles,
   resizeHandle?: ResizeHandle,
 
   // Callbacks
-  onLayoutChange: Layout => void,
+  onLayoutChange ,
   onDrag: EventCallback,
   onDragStart: EventCallback,
   onDragStop: EventCallback,
   onResize: EventCallback,
   onResizeStart: EventCallback,
   onResizeStop: EventCallback,
-  onDrop: (layout: Layout, item: ?LayoutItem, e: Event) => void,
+  onDrop: (layout: Layout, item:  LayoutItem, e: Event) => void,
   children: ReactChildrenArray<ReactElement<any>>,
   innerRef?: Ref<"div">
-|};
+ };
 
-export type DefaultProps = $Diff<
-  Props,
-  {
-    children: ReactChildrenArray<ReactElement<any>>,
-    width: number
-  }
->;
+
 
 export default {
   //
@@ -123,7 +114,7 @@ export default {
   compactType: (PropTypes.oneOf([
     "vertical",
     "horizontal"
-  ]): ReactPropsChainableTypeChecker),
+  ]) ),
 
   // layout is an array of object with the format:
   // {x: Number, y: Number, w: Number, h: Number, i: String}
@@ -139,11 +130,11 @@ export default {
   //
 
   // Margin between items [x, y] in px
-  margin: (PropTypes.arrayOf(PropTypes.number): ReactPropsChainableTypeChecker),
+  margin: (PropTypes.arrayOf(PropTypes.number) ),
   // Padding inside the container [x, y] in px
   containerPadding: (PropTypes.arrayOf(
     PropTypes.number
-  ): ReactPropsChainableTypeChecker),
+  ) ),
   // Rows have a static height, but you can change this based on breakpoints if you like
   rowHeight: PropTypes.number,
   // Default Infinity, but you can specify a max here if you like.
@@ -203,7 +194,7 @@ export default {
     i: PropTypes.string.isRequired,
     w: PropTypes.number.isRequired,
     h: PropTypes.number.isRequired
-  }): ReactPropsChainableTypeChecker),
+  }) ),
 
   // Children must not have duplicate keys.
   children: function (props: Props, propName: string) {

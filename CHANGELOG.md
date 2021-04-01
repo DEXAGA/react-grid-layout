@@ -486,7 +486,7 @@ Thanks to @daynin and @n1ghtmare for taking an active role in maintaining RGL, a
     If you like, you may delay mounting by setting `measureBeforeMount={true}` on the wrapped element. This
     will eliminate the mounting animation completely.
   - If you enjoyed the old animation, set `useCSSTransforms={this.state.mounted}` and toggle the mounting
-    flag. See `0-showcase.jsx` for an example.
+    flag. See `0-showcase.tsx` for an example.
 - Set more permissive version ranges for `<Draggable>` and `<Resizable>` dependencies, as they are now stable
   and will only introduce breaking changes on major version ticks.
 

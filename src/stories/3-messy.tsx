@@ -6,16 +6,16 @@ import type {Layout, ReactChildren} from '../react-grid-layout/lib/utils';
 
 const ReactGridLayout = WidthProvider(RGL);
 
-type Props = {|
+type Props = {
   className: string,
   cols: number,
   items: number,
   onLayoutChange: Function,
   rowHeight: number,
-|};
-type State = {|
+ };
+type State = {
   layout: Layout
-|};
+ };
 
 export default class MessyLayout extends React.PureComponent<Props, State> {
   static defaultProps: Props = {
@@ -59,7 +59,7 @@ export default class MessyLayout extends React.PureComponent<Props, State> {
     this.props.onLayoutChange(layout);
   }
 
-  render(): React.Node {
+  render()  {
     // eslint-disable-next-line no-unused-vars
     const {items, ...props} = this.props;
     return (

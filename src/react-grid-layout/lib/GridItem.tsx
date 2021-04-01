@@ -1,6 +1,5 @@
-// @flow
+
 import classNames from "classnames";
-import type {Element as ReactElement} from "react";
 import React from "react";
 import {DraggableCore} from "react-draggable";
 import {Resizable} from "react-resizable";
@@ -92,7 +91,7 @@ const GridItem = (props) => {
    */
   const onResizeHandler = (
           e: Event,
-          {node, size}: { node: HTMLElement, size: Position },
+          {node, size}: { node: HTMLElement, size  },
           handlerName: string
   ) => {
     const handler = props[handlerName];
@@ -136,7 +135,7 @@ const GridItem = (props) => {
     const {onDragStart, transformScale} = props;
     if (!onDragStart) return;
 
-    const newPosition: PartialPosition = {top: 0, left: 0};
+    const newPosition  = {top: 0, left: 0};
 
     // TODO: this wont work on nested parents
     const {offsetParent} = node;
@@ -185,8 +184,8 @@ const GridItem = (props) => {
     if (!state.dragging) {
       throw new Error("onDrag called before onDragStart.");
     }
-    let top = state.dragging.top + deltaY;
-    let left = state.dragging.left + deltaX;
+    let top = state?.dragging?.top + deltaY;
+    let left = state?.dragging?.left + deltaX;
 
     const {isBounded, i, w, h, containerWidth, containerHeight} = props;
     const positionParams = getPositionParams();
@@ -209,7 +208,7 @@ const GridItem = (props) => {
       }
     }
 
-    const newPosition: PartialPosition = {top, left};
+    const newPosition  = {top, left};
     setState(prevState => ({
       ...prevState,
       dragging: newPosition,
@@ -238,7 +237,7 @@ const GridItem = (props) => {
     }
     const {w, h, i} = props;
     const {left, top} = state.dragging;
-    const newPosition: PartialPosition = {top, left};
+    const newPosition  = {top, left};
     setState(prevState => ({
       ...prevState,
       dragging: null,
@@ -256,7 +255,7 @@ const GridItem = (props) => {
 
   // When a droppingPosition is present, this means we should fire a move event, as if we had moved
   // this element by `x, y` pixels.
-  const moveDroppingItem = (prevProps: Props) => {
+  const moveDroppingItem = (prevProps ) => {
     const {droppingPosition} = props;
     if (!droppingPosition) return;
     const node = elementRef.current;
@@ -309,7 +308,7 @@ const GridItem = (props) => {
    * @param  {Object} pos Position object with width, height, left, top.
    * @return {Object}     Style object.
    */
-  const createStyle = (pos: Position) => {
+  const createStyle = (pos ) => {
     const {usePercentages, containerWidth, useCSSTransforms} = props;
 
     let style;

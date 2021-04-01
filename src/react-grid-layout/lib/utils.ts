@@ -17,12 +17,12 @@ export type LayoutItem = {
   maxH?: number,
   moved?: boolean,
   static?: boolean,
-  isDraggable?: ?boolean,
-  isResizable?: ?boolean,
+  isDraggable?:  boolean,
+  isResizable?:  boolean,
   resizeHandles?: Array<"s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne">,
-  isBounded?: ?boolean
+  isBounded?:  boolean
 };
-export type Layout = $ReadOnlyArray<LayoutItem>;
+export type Layout =  Readonly<LayoutItem>[];
 export type Position = {
   left: number,
   top: number,
@@ -48,18 +48,8 @@ export type GridDragEvent = {
   newPosition: PartialPosition
 };
 export type GridResizeEvent = { e: Event, node: HTMLElement, size: Size };
-export type DragOverEvent = MouseEvent & {
-  nativeEvent: {
-    layerX: number,
-    layerY: number,
-    ...Event
-  }
-};
 
-// Helpful port from TS
-export type Pick<FromType, Properties: { [string]: 0 }> = $Exact<
-  $ObjMapi<Properties, <K, V>(k: K, v: V) => $ElementType<FromType, K>>
->;
+
 
 type REl = ReactElement<any>;
 export type ReactChildren = ReactChildrenArray<REl>;
@@ -67,13 +57,13 @@ export type ReactChildren = ReactChildrenArray<REl>;
 // All callbacks are of the signature (layout, oldItem, newItem, placeholder, e).
 export type EventCallback = (
   Layout,
-  oldItem: ?LayoutItem,
-  newItem: ?LayoutItem,
-  placeholder: ?LayoutItem,
+  oldItem:  LayoutItem,
+  newItem:  LayoutItem,
+  placeholder:  LayoutItem,
   Event,
-  ?HTMLElement
+   HTMLElement
 ) => void;
-export type CompactType = ?("horizontal" | "vertical");
+export type CompactType =  ("horizontal" | "vertical");
 
 const isProduction = process.env.NODE_ENV === "production";
 const DEBUG = false;
@@ -121,8 +111,8 @@ export function modifyLayout(layout: Layout, layoutItem: LayoutItem): Layout {
 export function withLayoutItem(
   layout: Layout,
   itemKey: string,
-  cb: LayoutItem => LayoutItem
-): [Layout, ?LayoutItem] {
+  cb
+)  {
   let item = getLayoutItem(layout, itemKey);
   if (!item) return [layout, null];
   item = cb(cloneLayoutItem(item)); // defensive clone then modify
@@ -165,7 +155,7 @@ export function childrenEqual(a: ReactChildren, b: ReactChildren): boolean {
 }
 
 /**
- * See `fastRGLPropsEqual.js`.
+ * See `fastRGLPropsEqual.ts`.
  * We want this to run as fast as possible - it is called often - and to be
  * resilient to new props that we add. So rather than call lodash.isEqual,
  * which isn't suited to comparing props very well, we use this specialized
@@ -372,7 +362,7 @@ export function correctBounds(
  * @param  {String} id     ID
  * @return {LayoutItem}    Item at ID.
  */
-export function getLayoutItem(layout: Layout, id: string): ?LayoutItem {
+export function getLayoutItem(layout: Layout, id: string)  {
   for (let i = 0, len = layout.length; i < len; i++) {
     if (layout[i].i === id) return layout[i];
   }
@@ -389,7 +379,7 @@ export function getLayoutItem(layout: Layout, id: string): ?LayoutItem {
 export function getFirstCollision(
   layout: Layout,
   layoutItem: LayoutItem
-): ?LayoutItem {
+):  LayoutItem {
   for (let i = 0, len = layout.length; i < len; i++) {
     if (collides(layout[i], layoutItem)) return layout[i];
   }
@@ -424,10 +414,10 @@ export function getStatics(layout: Layout): Array<LayoutItem> {
 export function moveElement(
   layout: Layout,
   l: LayoutItem,
-  x: ?number,
-  y: ?number,
-  isUserAction: ?boolean,
-  preventCollision: ?boolean,
+  x:  number,
+  y:  number,
+  isUserAction:  boolean,
+  preventCollision:  boolean,
   compactType: CompactType,
   cols: number
 ): Layout {
@@ -520,7 +510,7 @@ export function moveElementAwayFromCollision(
   layout: Layout,
   collidesWith: LayoutItem,
   itemToMove: LayoutItem,
-  isUserAction: ?boolean,
+  isUserAction:  boolean,
   compactType: CompactType,
   cols: number
 ): Layout {
@@ -765,7 +755,7 @@ export function validateLayout(
 
 // Legacy support for verticalCompact: false
 export function compactType(
-  props: ?{ verticalCompact: boolean, compactType: CompactType }
+  props
 ): CompactType {
   const { verticalCompact, compactType } = props || {};
   return verticalCompact === false ? null : compactType;

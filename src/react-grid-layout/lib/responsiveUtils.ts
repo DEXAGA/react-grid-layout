@@ -4,22 +4,6 @@ import { cloneLayout, compact, correctBounds } from "./utils";
 
 import type { CompactType, Layout } from "./utils";
 
-export type Breakpoint = string;
-export type DefaultBreakpoints = "lg" | "md" | "sm" | "xs" | "xxs";
-
-// + indicates read-only
-export type ResponsiveLayout<T: Breakpoint> = {
-  +[breakpoint: T]: Layout
-};
-export type Breakpoints<T: Breakpoint> = {
-  +[breakpoint: T]: number
-};
-
-export type OnLayoutChangeCallback = (
-  Layout,
-  { [key: Breakpoint]: Layout }
-) => void;
-
 /**
  * Given a width, find the highest breakpoint that matches is valid for it (width > breakpoint).
  *
@@ -28,9 +12,9 @@ export type OnLayoutChangeCallback = (
  * @return {String}       Highest breakpoint that is less than width.
  */
 export function getBreakpointFromWidth(
-  breakpoints: Breakpoints<Breakpoint>,
+  breakpoints ,
   width: number
-): Breakpoint {
+)  {
   const sorted = sortBreakpoints(breakpoints);
   let matching = sorted[0];
   for (let i = 1, len = sorted.length; i < len; i++) {
@@ -47,8 +31,8 @@ export function getBreakpointFromWidth(
  * @return {Number}            Number of cols.
  */
 export function getColsFromBreakpoint(
-  breakpoint: Breakpoint,
-  cols: Breakpoints<Breakpoint>
+  breakpoint ,
+  cols
 ): number {
   if (!cols[breakpoint]) {
     throw new Error(
@@ -75,10 +59,10 @@ export function getColsFromBreakpoint(
  * @return {Array}             New layout.
  */
 export function findOrGenerateResponsiveLayout(
-  layouts: ResponsiveLayout<Breakpoint>,
-  breakpoints: Breakpoints<Breakpoint>,
-  breakpoint: Breakpoint,
-  lastBreakpoint: Breakpoint,
+  layouts ,
+  breakpoints ,
+  breakpoint ,
+  lastBreakpoint ,
   cols: number,
   compactType: CompactType
 ): Layout {
@@ -109,8 +93,8 @@ export function findOrGenerateResponsiveLayout(
  * @return {Array}              Sorted breakpoints.
  */
 export function sortBreakpoints(
-  breakpoints: Breakpoints<Breakpoint>
-): Array<Breakpoint> {
+  breakpoints
+)  {
   const keys: Array<string> = Object.keys(breakpoints);
   return keys.sort(function (a, b) {
     return breakpoints[a] - breakpoints[b];

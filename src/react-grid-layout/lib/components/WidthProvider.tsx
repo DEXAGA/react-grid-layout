@@ -1,31 +1,10 @@
-// @flow
+
 import * as React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import type { ReactRef } from "../ReactGridLayoutPropTypes";
 
-type WPDefaultProps = {|
-  measureBeforeMount: boolean
-|};
 
-// eslint-disable-next-line no-unused-vars
-type WPProps = {|
-  className?: string,
-  style?: Object,
-  ...WPDefaultProps
-|};
-
-type WPState = {|
-  width: number
-|};
-
-type ComposedProps<Config> = {|
-  ...Config,
-  measureBeforeMount?: boolean,
-  className?: string,
-  style?: Object,
-  width?: number
-|};
 
 const layoutClassName = "react-grid-layout";
 
@@ -36,13 +15,10 @@ const layoutClassName = "react-grid-layout";
  * a flow bug of some sort that causes it to stop typechecking.
  */
 export default function WidthProvideRGL<Config>(
-  ComposedComponent: React.AbstractComponent<Config>
-): React.AbstractComponent<ComposedProps<Config>> {
-  return class WidthProvider extends React.Component<
-    ComposedProps<Config>,
-    WPState
-  > {
-    static defaultProps: WPDefaultProps = {
+  ComposedComponent: JSX.IntrinsicAttributes
+) {
+  return class WidthProvider extends React.Component {
+    static defaultProps  = {
       measureBeforeMount: false
     };
 
@@ -52,11 +28,11 @@ export default function WidthProvideRGL<Config>(
       measureBeforeMount: PropTypes.bool
     };
 
-    state: WPState = {
+    state  = {
       width: 1280
     };
 
-    elementRef: ReactRef<HTMLDivElement> = React.createRef();
+    elementRef  = React.createRef();
     mounted: boolean = false;
 
     componentDidMount() {
@@ -84,7 +60,10 @@ export default function WidthProvideRGL<Config>(
     };
 
     render() {
-      const { measureBeforeMount, ...rest } = this.props;
+      const {
+        measureBeforeMount,
+        ...rest
+      } = this.props;
       if (measureBeforeMount && !this.mounted) {
         return (
           <div

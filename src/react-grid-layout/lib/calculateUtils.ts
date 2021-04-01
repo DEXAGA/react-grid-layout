@@ -72,8 +72,8 @@ export function calcGridItemPosition(
   // If resizing, use the exact width and height as returned from resizing callbacks.
   if (state && state.resizing) {
 
-    out.width = Math.round(state.resizing.width);
-    out.height = Math.round(state.resizing.height);
+    out.width = Math.round(state?.resizing?.width ?? 0);
+    out.height = Math.round(state?.resizing?.height ?? 0);
   }
   // Otherwise, calculate from grid units.
   else {

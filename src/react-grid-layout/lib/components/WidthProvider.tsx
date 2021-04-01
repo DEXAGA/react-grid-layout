@@ -1,9 +1,7 @@
-
 import * as React from "react";
 import PropTypes from "prop-types";
+// @ts-ignore
 import classNames from "classnames";
-import type { ReactRef } from "../ReactGridLayoutPropTypes";
-
 
 
 const layoutClassName = "react-grid-layout";
@@ -15,7 +13,7 @@ const layoutClassName = "react-grid-layout";
  * a flow bug of some sort that causes it to stop typechecking.
  */
 export default function WidthProvideRGL<Config>(
-  ComposedComponent: JSX.IntrinsicAttributes
+  ComposedComponent: any
 ) {
   return class WidthProvider extends React.Component {
     static defaultProps  = {
@@ -62,14 +60,17 @@ export default function WidthProvideRGL<Config>(
     render() {
       const {
         measureBeforeMount,
+        style, className,
         ...rest
-      } = this.props;
+      }:any = this.props ;
       if (measureBeforeMount && !this.mounted) {
+
         return (
           <div
-            className={classNames(this.props.className, layoutClassName)}
-            style={this.props.style}
-            // $FlowIgnore ref types
+            className={classNames(className, layoutClassName)}
+            style={style}
+
+        // @ts-ignore
             ref={this.elementRef}
           />
         );

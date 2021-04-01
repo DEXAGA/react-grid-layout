@@ -1,5 +1,6 @@
 // @preval
 
+// @ts-ignore
 require("@babel/register");
 
 // Fast way to compare RGL props in shouldComponentUpdate.
@@ -18,7 +19,7 @@ keys.splice(keys.indexOf("children"), 1);
 // In most cases we want to do a simple equality comparison,
 // but we have some arrays and tuples and objects we want
 // to do a shallow comparison on.
-function getEqualType(key) {
+function getEqualType(key: string | number) {
   if (
     [
       PropTypes.number,

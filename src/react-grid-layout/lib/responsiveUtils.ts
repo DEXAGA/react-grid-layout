@@ -12,7 +12,7 @@ import type { CompactType, Layout } from "./utils";
  * @return {String}       Highest breakpoint that is less than width.
  */
 export function getBreakpointFromWidth(
-  breakpoints ,
+  breakpoints: { [x: string]: number; } ,
   width: number
 )  {
   const sorted = sortBreakpoints(breakpoints);
@@ -31,8 +31,8 @@ export function getBreakpointFromWidth(
  * @return {Number}            Number of cols.
  */
 export function getColsFromBreakpoint(
-  breakpoint ,
-  cols
+  breakpoint: string,
+  cols: { [x: string]: number; }
 ): number {
   if (!cols[breakpoint]) {
     throw new Error(
@@ -59,12 +59,12 @@ export function getColsFromBreakpoint(
  * @return {Array}             New layout.
  */
 export function findOrGenerateResponsiveLayout(
-  layouts ,
-  breakpoints ,
-  breakpoint ,
-  lastBreakpoint ,
+  layouts: { [x: string]: any; },
+  breakpoints: { [x: string]: number; },
+  breakpoint: string,
+  lastBreakpoint: string ,
   cols: number,
-  compactType: CompactType
+  compactType:any
 ): Layout {
   // If it already exists, just return it.
   if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
@@ -93,7 +93,7 @@ export function findOrGenerateResponsiveLayout(
  * @return {Array}              Sorted breakpoints.
  */
 export function sortBreakpoints(
-  breakpoints
+  breakpoints: { [x: string]: number; }
 )  {
   const keys: Array<string> = Object.keys(breakpoints);
   return keys.sort(function (a, b) {

@@ -3,16 +3,12 @@ import PropTypes from "prop-types";
 import React from "react";
 import type {
   Ref,
-  ChildrenArray as ReactChildrenArray,
-  Element as ReactElement
 } from "react";
 import type { EventCallback, CompactType, Layout, LayoutItem } from "./utils";
 
 type ResizeHandleAxis = "s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne";
 export type ResizeHandles = Array<ResizeHandleAxis>;
-export type ResizeHandle =
-  | ReactElement<any>
-  | ((resizeHandleAxis: ResizeHandleAxis) => ReactElement<any>);
+
 
 
 
@@ -46,7 +42,7 @@ export type Props = {
   compactType: CompactType,
   layout: Layout,
   margin: [number, number],
-  containerPadding: ?[number, number],
+  containerPadding:  [number, number],
   rowHeight: number,
   maxRows: number,
   isBounded: boolean,
@@ -56,12 +52,12 @@ export type Props = {
   preventCollision: boolean,
   useCSSTransforms: boolean,
   transformScale: number,
-  droppingItem ,
+  droppingItem:{} ,
   resizeHandles: ResizeHandles,
-  resizeHandle?: ResizeHandle,
+  resizeHandle: any ,
 
   // Callbacks
-  onLayoutChange ,
+  onLayoutChange:()=>{} ,
   onDrag: EventCallback,
   onDragStart: EventCallback,
   onDragStop: EventCallback,
@@ -69,7 +65,7 @@ export type Props = {
   onResizeStart: EventCallback,
   onResizeStop: EventCallback,
   onDrop: (layout: Layout, item:  LayoutItem, e: Event) => void,
-  children: ReactChildrenArray<ReactElement<any>>,
+  children: any ,
   innerRef?: Ref<"div">
  };
 
@@ -198,11 +194,13 @@ export default {
 
   // Children must not have duplicate keys.
   children: function (props: Props, propName: string) {
+    // @ts-ignore
     var children = props[propName];
 
     // Check children keys for duplicates. Throw if found.
     var keys = {};
     React.Children.forEach(children, function (child) {
+      // @ts-ignore
       if (keys[child.key]) {
         throw new Error(
           'Duplicate child key "' +
@@ -210,6 +208,7 @@ export default {
             '" found! This will cause problems in ReactGridLayout.'
         );
       }
+      // @ts-ignore
       keys[child.key] = true;
     });
   },

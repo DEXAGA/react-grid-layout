@@ -1,7 +1,9 @@
 
+// @ts-ignore
 import classNames from "classnames";
 import React from "react";
 import {DraggableCore} from "react-draggable";
+// @ts-ignore
 import {Resizable} from "react-resizable";
 import {
   calcGridColWidth,
@@ -12,13 +14,13 @@ import {
   calcXY,
   clamp
 } from "./calculateUtils";
-import {perc, setTopLeft, setTransform} from "./utils";
+import {perc, Position, setTopLeft, setTransform} from "./utils";
 
 
 /**
  * An individual item within a ReactGridLayout.
  */
-const GridItem = (props) => {
+const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any; containerWidth?: any; containerHeight?: any; margin?: any; maxRows?: any; rowHeight?: any; w?: any; h?: any; i?: any; x?: any; minW?: any; minH?: any; maxW?: any; maxH?: any; y?: any; isDraggable?: any; handle?: any; cancel?: any; transformScale?: any; isResizable?: any; resizeHandles?: any; resizeHandle?: any; children?: any; className?: any; static?: any; droppingPosition?: any; useCSSTransforms?: any; style?: any; onDragStart?: any; onDrag?: any; isBounded?: any; onDragStop?: any; usePercentages?: any; }) => {
   const [state, setState] = React.useState({
     resizing: null,
     dragging: null,
@@ -33,7 +35,7 @@ const GridItem = (props) => {
     }))
   }, [])
 
-  const elementRef = React.createRef();
+  const elementRef: any = React.createRef();
 
   // shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
   //   // We can't deeply compare children. If the developer memoizes them, we can
@@ -91,7 +93,7 @@ const GridItem = (props) => {
    */
   const onResizeHandler = (
           e: Event,
-          {node, size}: { node: HTMLElement, size  },
+          {node, size}:any ,
           handlerName: string
   ) => {
     const handler = props[handlerName];
@@ -131,7 +133,7 @@ const GridItem = (props) => {
    * @param  {Event}  e             event data
    * @param  {Object} callbackData  an object with node, delta and position information
    */
-  const onDragStart = (e, {node}) => {
+  const onDragStart = (e:Event, {node}:any) => {
     const {onDragStart, transformScale} = props;
     if (!onDragStart) return;
 
@@ -148,6 +150,7 @@ const GridItem = (props) => {
     const pTop = parentRect.top / transformScale;
     newPosition.left = cLeft - pLeft + offsetParent.scrollLeft;
     newPosition.top = cTop - pTop + offsetParent.scrollTop;
+    // @ts-ignore
     setState(prevState => ({
       ...prevState,
       dragging: newPosition,
@@ -175,8 +178,8 @@ const GridItem = (props) => {
    * @param  {Object} callbackData  an object with node, delta and position information
    */
   const onDrag = (
-          e,
-          {node, deltaX, deltaY}
+          e:Event,
+          {node, deltaX, deltaY}: {node: any, deltaX: any, deltaY: any}
   ) => {
     const {onDrag} = props;
     if (!onDrag) return;
@@ -184,7 +187,9 @@ const GridItem = (props) => {
     if (!state.dragging) {
       throw new Error("onDrag called before onDragStart.");
     }
+    // @ts-ignore
     let top = state?.dragging?.top + deltaY;
+    // @ts-ignore
     let left = state?.dragging?.left + deltaX;
 
     const {isBounded, i, w, h, containerWidth, containerHeight} = props;
@@ -209,6 +214,7 @@ const GridItem = (props) => {
     }
 
     const newPosition  = {top, left};
+    // @ts-ignore
     setState(prevState => ({
       ...prevState,
       dragging: newPosition,
@@ -228,7 +234,7 @@ const GridItem = (props) => {
    * @param  {Event}  e             event data
    * @param  {Object} callbackData  an object with node, delta and position information
    */
-  const onDragStop = (e, {node}) => {
+  const onDragStop = (e:Event, {node}:any) => {
     const {onDragStop} = props;
     if (!onDragStop) return;
 
@@ -236,7 +242,8 @@ const GridItem = (props) => {
       throw new Error("onDragEnd called before onDragStart.");
     }
     const {w, h, i} = props;
-    const {left, top} = state.dragging;
+
+    const {left, top}: any = state.dragging;
     const newPosition  = {top, left};
     setState(prevState => ({
       ...prevState,
@@ -255,7 +262,7 @@ const GridItem = (props) => {
 
   // When a droppingPosition is present, this means we should fire a move event, as if we had moved
   // this element by `x, y` pixels.
-  const moveDroppingItem = (prevProps ) => {
+  const moveDroppingItem = (prevProps: { droppingPosition?: any; } ) => {
     const {droppingPosition} = props;
     if (!droppingPosition) return;
     const node = elementRef.current;
@@ -266,7 +273,7 @@ const GridItem = (props) => {
       left: 0,
       top: 0
     };
-    const {dragging} = state;
+    const {dragging}: {  dragging: null; resizing: null; className: string } = state;
 
     const shouldDrag =
             (dragging && droppingPosition.left !== prevDroppingPosition.left) ||
@@ -279,8 +286,10 @@ const GridItem = (props) => {
         deltaY: droppingPosition.top
       });
     } else if (shouldDrag) {
-      const deltaX = droppingPosition.left - dragging.left;
-      const deltaY = droppingPosition.top - dragging.top;
+      // @ts-ignore
+      const deltaX = droppingPosition.left - dragging?.left;
+      // @ts-ignore
+      const deltaY = droppingPosition.top - dragging?.top;
 
       onDrag(droppingPosition.e, {
         node,
@@ -308,10 +317,10 @@ const GridItem = (props) => {
    * @param  {Object} pos Position object with width, height, left, top.
    * @return {Object}     Style object.
    */
-  const createStyle = (pos ) => {
+  const createStyle = (pos: Position ) => {
     const {usePercentages, containerWidth, useCSSTransforms} = props;
 
-    let style;
+    let style: any =undefined;
     // CSS Transforms support (default)
     if (useCSSTransforms) {
       style = setTransform(pos);
@@ -332,19 +341,28 @@ const GridItem = (props) => {
   const positionParams = getPositionParams();
 
   // This is the max possible width - doesn't go to infinity because of the width of the window
-  const maxWidth = calcGridItemPosition(positionParams, 0, 0, props.cols - props.x, 0)
+  const maxWidth = calcGridItemPosition(positionParams, 0, 0, props.cols - props.x, 0, {
+    dragging: undefined,
+    resizing: undefined
+  })
           .width;
 
   // Calculate min/max constraints using our min & maxes
-  const mins = calcGridItemPosition(positionParams, 0, 0, props.minW, props.minH);
-  const maxes = calcGridItemPosition(positionParams, 0, 0, props.maxW, props.maxH);
+  const mins = calcGridItemPosition(positionParams, 0, 0, props.minW, props.minH, {
+    dragging: undefined,
+    resizing: undefined
+  });
+  const maxes = calcGridItemPosition(positionParams, 0, 0, props.maxW, props.maxH, {
+    dragging: undefined,
+    resizing: undefined
+  });
   const minConstraints = [mins.width, mins.height];
   const maxConstraints = [
     Math.min(maxes.width, maxWidth),
     Math.min(maxes.height, Infinity)
   ];
 
-  const newPosition = calcGridItemPosition(
+  const newPosition: any = calcGridItemPosition(
           getPositionParams(),
           props.x,
           props.y,
@@ -356,6 +374,7 @@ const GridItem = (props) => {
   // console.log(props, newPosition)
   // console.log(props.i, newPosition)
   return (
+  // @ts-ignore
           <DraggableCore
                   disabled={!props.isDraggable}
                   onStart={onDragStart}
@@ -368,6 +387,7 @@ const GridItem = (props) => {
                   }
                   scale={props.transformScale}
                   nodeRef={elementRef}
+
           >
             <Resizable
                     draggableOpts={{
@@ -380,20 +400,20 @@ const GridItem = (props) => {
                     minConstraints={minConstraints}
                     maxConstraints={maxConstraints}
                     onResizeStop={(
-                            e,
-                            callbackData
+                            e: Event,
+                            callbackData: any
                     ) => {
                       onResizeHandler(e, callbackData, "onResizeStop");
                     }}
                     onResizeStart={(
-                            e,
-                            callbackData
+                            e: Event,
+                            callbackData: any
                     ) => {
                       onResizeHandler(e, callbackData, "onResizeStart");
                     }}
                     onResize={(
-                            e,
-                            callbackData
+                            e: Event,
+                            callbackData: any
                     ) => {
                       onResizeHandler(e, callbackData, "onResize");
                     }}

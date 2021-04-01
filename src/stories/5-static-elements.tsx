@@ -6,7 +6,8 @@ const ReactGridLayout = WidthProvider(RGL);
 const StaticElementsLayout = (props) => {
   return (
       <ReactGridLayout
-        className="layout"
+              /* @ts-ignore */
+        className={"layout"}
         onLayoutChange={(layout) => {
           // props.onLayoutChange(layout);
         }}

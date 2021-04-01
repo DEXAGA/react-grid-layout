@@ -3,7 +3,7 @@ import _ from "lodash";
 import { Responsive, WidthProvider } from "../react-grid-layout";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
-class ToolBoxItem extends React.Component {
+class ToolBoxItem extends React.Component<any,any> {
   render() {
     return (
       <div
@@ -15,7 +15,7 @@ class ToolBoxItem extends React.Component {
     );
   }
 }
-class ToolBox extends React.Component {
+class ToolBox extends React.Component<any,any> {
   render() {
     return (
       <div className="toolbox">
@@ -34,7 +34,7 @@ class ToolBox extends React.Component {
   }
 }
 
-export default class ToolboxLayout extends React.Component {
+export default class ToolboxLayout extends React.Component<any,any> {
   static defaultProps = {
     className: "layout",
     rowHeight: 30,

@@ -23,6 +23,7 @@ export default class BootstrapStyleLayout extends React.PureComponent {
   render() {
     return (
       <ResponsiveReactGridLayout
+              /* @ts-ignore */
         onLayoutChange={this.onLayoutChange}
         {...this.props}
       >

@@ -15,7 +15,7 @@ const layoutClassName = "react-grid-layout";
 export default function WidthProvideRGL<Config>(
   ComposedComponent: any
 ) {
-  return class WidthProvider extends React.Component {
+  return class WidthProvider extends React.Component<any,any> {
     static defaultProps  = {
       measureBeforeMount: false
     };

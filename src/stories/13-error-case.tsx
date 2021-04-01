@@ -5,7 +5,9 @@ const ReactGridLayout = WidthProvider(RGL);
 
 const ErrorCaseLayout = (props) => {
 
-  const [state, setState] = React.useState()
+  const [state, setState] = React.useState({
+    layout: undefined
+  })
 
   React.useEffect(() => {
     setState({

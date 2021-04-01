@@ -6,7 +6,9 @@ const ReactGridLayout = WidthProvider(RGL);
 
 const NoCollisionLayout = (props) => {
 
-  const [state, setState] = React.useState()
+  const [state, setState] = React.useState({
+    layout: undefined
+  })
 
   React.useEffect(() => {
     setState({
@@ -52,30 +54,16 @@ const NoCollisionLayout = (props) => {
 NoCollisionLayout.defaultProps =
 {
   className: "layout",
-          items
-:
-  50,
-          cols
-:
-  12,
-          rowHeight
-:
-  30,
-          onLayoutChange
-:
-
-  function() {
-  }
-
-,
+          items: 50,
+          cols: 12,
+          rowHeight: 30,
+          onLayoutChange: function() {
+  },
   // This turns off compaction so you can place items wherever.
   verticalCompact: false,
           // This turns off rearrangement so items will not be pushed arround.
-          preventCollision
-:
-  true
-}
-;
+          preventCollision: true
+};
 
 
 export default NoCollisionLayout

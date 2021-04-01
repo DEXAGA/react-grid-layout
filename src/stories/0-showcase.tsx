@@ -1,4 +1,4 @@
-// @flow
+
 import _ from "lodash";
 import * as React from "react";
 import WidthProvider from '../react-grid-layout/lib/components/WidthProvider';
@@ -29,7 +29,8 @@ const ShowcaseLayout = (props: {
     height: 300,
     currentBreakpoint: "lg",
     compactType: "vertical",
-    mounted: true,
+    mounted: true, layouts: undefined
+
   })
   const parentRef = React.useRef();
 
@@ -38,9 +39,11 @@ const ShowcaseLayout = (props: {
     const node = parentRef.current; // Flow casts this to Text | Element
     // fix: grid position error when node or parentNode display is none by window resize
     // #924 #1084
+    // @ts-ignore
     if (node instanceof HTMLElement && node.offsetHeight) {
       setState(prevState => ({
                 ...prevState,
+      // @ts-ignore
                 height: node.offsetHeight,
               })
       );

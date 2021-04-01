@@ -1,5 +1,5 @@
 import React from "react";
-import { WidthProvider, Responsive } from "../react-grid-layout";
+import {Responsive, WidthProvider} from "../react-grid-layout";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const originalLayouts = getFromLS("layouts") || {};
@@ -7,7 +7,7 @@ const originalLayouts = getFromLS("layouts") || {};
 /**
  * This layout demonstrates how to sync multiple responsive layouts to localstorage.
  */
-export default class ResponsiveLocalStorageLayout extends React.PureComponent {
+export default class ResponsiveLocalStorageLayout extends React.PureComponent<any,any> {
   constructor(props) {
     super(props);
 
@@ -34,14 +34,16 @@ export default class ResponsiveLocalStorageLayout extends React.PureComponent {
   }
 
   render() {
+    const {layouts} = this.state;
     return (
       <div>
         <button onClick={() => this.resetLayout()}>Reset Layout</button>
         <ResponsiveReactGridLayout
-          className="layout"
+          /*      @ts-ignore*/
+          className={"layout"}
           cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
           rowHeight={30}
-          layouts={this.state.layouts}
+          layouts={layouts}
           onLayoutChange={(layout, layouts) =>
             this.onLayoutChange(layout, layouts)
           }

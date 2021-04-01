@@ -6,7 +6,9 @@ const ReactGridLayout = WidthProvider(RGL);
 
 const NoCompactingLayout = (props) => {
 
-  const [state, setState] = React.useState()
+  const [state, setState] = React.useState({
+    layout: undefined
+  })
 
   React.useEffect(() => {
     setState({

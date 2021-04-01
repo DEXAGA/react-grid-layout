@@ -6,7 +6,14 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 const DragFromOutsideLayout = (props) => {
 
-  const [state, setState] = React.useState()
+  const [state, setState] = React.useState({
+    layouts: {
+      lg:undefined
+    },
+    currentBreakpoint: undefined,
+    mounted: undefined,
+    compactType: undefined
+  })
 
   React.useEffect(() => {
     setState({
@@ -39,6 +46,7 @@ const DragFromOutsideLayout = (props) => {
 
   const onBreakpointChange = breakpoint => {
     setState({
+       ...state,
       currentBreakpoint: breakpoint
     });
   };
@@ -51,7 +59,7 @@ const DragFromOutsideLayout = (props) => {
                     : oldCompactType === "vertical"
                     ? null
                     : "horizontal";
-    setState({compactType});
+    setState({...state,compactType});
   };
 
   const onLayoutChange = (layout, layouts) => {
@@ -59,7 +67,7 @@ const DragFromOutsideLayout = (props) => {
   };
 
   const onNewLayout = () => {
-    setState({
+    setState({ ...state,
       layouts: {lg: generateLayout()}
     });
   };

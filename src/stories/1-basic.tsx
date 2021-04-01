@@ -6,10 +6,13 @@ const ReactGridLayout = WidthProvider(RGL);
 
 const BasicLayout = (props) => {
 
-  const [state, setState] = React.useState()
+  const [state, setState] = React.useState({
+    layout: undefined,
+    height: undefined
+  })
 
   React.useEffect(() => {
-    setState({
+    setState({...state,
       layout: _.map(new Array(props.items), function(item, i) {
         const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
         return {

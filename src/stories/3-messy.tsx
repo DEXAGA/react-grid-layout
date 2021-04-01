@@ -7,7 +7,9 @@ const ReactGridLayout = WidthProvider(RGL);
 
 const MessyLayout = (props) => {
 
-  const [state, setState] = React.useState()
+  const [state, setState] = React.useState({
+    layout: undefined
+  })
 
   React.useEffect(() => {
     setState({

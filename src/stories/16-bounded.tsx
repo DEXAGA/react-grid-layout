@@ -4,7 +4,7 @@ import RGL, { WidthProvider } from "../react-grid-layout";
 
 const ReactGridLayout = WidthProvider(RGL);
 
-export default class BoundedLayout extends React.PureComponent {
+export default class BoundedLayout extends React.PureComponent<any,any> {
   static defaultProps = {
     className: "layout",
     items: 20,
@@ -51,6 +51,7 @@ export default class BoundedLayout extends React.PureComponent {
   render() {
     return (
       <ReactGridLayout
+              /* @ts-ignore */
         layout={this.state.layout}
         onLayoutChange={this.onLayoutChange}
         isBounded={true}

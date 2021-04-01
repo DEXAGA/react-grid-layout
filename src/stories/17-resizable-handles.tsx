@@ -4,7 +4,7 @@ import RGL, { WidthProvider } from "../react-grid-layout";
 
 const ReactGridLayout = WidthProvider(RGL);
 
-export default class ResizableHandles extends React.PureComponent {
+export default class ResizableHandles extends React.PureComponent<any,any> {
   static defaultProps = {
     className: "layout",
     items: 20,
@@ -54,6 +54,7 @@ export default class ResizableHandles extends React.PureComponent {
   render() {
     return (
       <ReactGridLayout
+
         layout={this.state.layout}
         onLayoutChange={this.onLayoutChange}
         {...this.props}

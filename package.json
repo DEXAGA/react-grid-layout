@@ -1,87 +1,35 @@
 {
   "name": "react-grid-layout-hooks",
   "version": "0.1.0",
-  "private": true,
+  "author": "Cedric McKinnie",
+  "license": "MIT",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "classnames": "2.x",
     "lodash.isequal": "^4.0.0",
-    "prop-types": "^15.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-draggable": "^4.0.0",
-    "react-resizable": "^1.10.0",
-    "react-scripts": "4.0.3",
-    "typescript": "^4.2.3",
-    "@types/react-dom": "^17.0.3",
-    "web-vitals": "^1.0.1"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
-  },
-  "resolutions": {
-    "babel-loader": "8.1.0"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react-draggable": "^4.4.3",
+    "react-resizable": "^1.11.1",
+    "typescript": "^4.2.3"
   },
   "devDependencies": {
-    "@babel/preset-flow": "^7.12.13",
-    "@babel/preset-react": "^7.12.13",
-    "@babel/register": "^7.13.8",
-    "@storybook/addon-actions": "^6.2.0",
-    "@storybook/addon-essentials": "^6.2.0",
-    "@storybook/addon-links": "^6.2.0",
-    "@storybook/node-logger": "^6.2.0",
-    "@storybook/preset-create-react-app": "^3.1.7",
-    "@storybook/react": "^6.2.0",
-
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^26.6.3",
-    "babel-plugin-preval": "^5.0.0",
-    "ejs": "^3.1.6",
-    "eslint": "^7.21.0",
-    "eslint-config-react-app": "^6.0.0",
-    "eslint-plugin-flowtype": "^5.3.1",
-    "eslint-plugin-mocha": "^8.0.0",
-    "eslint-plugin-react": "^7.22.0",
-    "flow-bin": "^0.145.0",
-    "lodash": "^4.17.21",
-    "opener": "^1.5.2",
-    "prettier": "^2.2.1",
-    "style-loader": "^2.0.0",
-    "timsort": "^0.3.0"
+    "@babel/core": "^7.13.14",
+    "@babel/register": "^7.13.14",
+    "@storybook/addon-actions": "^6.2.3",
+    "@storybook/addon-docs": "^6.2.3",
+    "@storybook/addon-essentials": "^6.2.3",
+    "@storybook/addon-links": "^6.2.3",
+    "@storybook/react": "^6.2.3",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "babel-loader": "^8.2.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "ts-loader": "^8.1.0",
+    "webpack": "^5.30.0",
+    "webpack-bundle-analyzer": "^4.4.0",
+    "webpack-cli": "^4.6.0"
+  },
+  "scripts": {
+    "build": "webpack",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   }
 }

@@ -469,10 +469,6 @@ Run the storybook to see examples
 
 ```yarn storybook```
 
-Start create-react-app to fiddle with components. The hot reloader and error handler is MUCH better in this build than in the storybook
-
-```yarn start```
-
 If you have a feature request, please add it as an issue or make a pull request.
 
 If you have a bug to report, please reproduce the bug in a codesandbox to help

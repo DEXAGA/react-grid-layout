@@ -34,19 +34,19 @@ Here's my attempt at reviving community engagement on the project and giving it 
 
 ## Changes from the original React-grid-layout
 
-- **Migration to Hooks:** I've rewritten some of the core components from legacy Class components to Functional components so that we can fully support React Hooks
-- **Migration to Create React App:** The previous version was managing it's entire build from scratch which made sense at the time that this project was developing but now that CRA is a thing, I don't see a reason not to take advantage of build-related best practices officially supported by the React team themselses
+- **Migration to Hooks:** I've rewritten some of the core components from legacy Class components to Functional components so that we can fully support React Hooks.j
+- **Migration to Typescript:** Most flow types have been removed in favor of Typescript which appears to be the de facto type utility.
 
 ## TODO List:
 
 - [x] Create a Storybook with the examples in it.
-- [ ] Remove Flow to Typescript
+- [x] Migrate Flow to Typescript
 - [ ] Finish migrating remaining components/examples to Hooks
-- [ ] Manually read typescript using old flow types as a reference (not a bit project)
-- [ ] Transition away from HOC Width/Height provider
+- [ ] Manually read typescript using old flow types as a reference (not a big project)
+- [ ] Upgrade Width/Height providers to hooks
 - [ ] Create new npm package for distribution.
 - [ ] Create a codesandbox for main showcase and issue replication.
-- [ ] Redo basic tests.
+- [ ] Migrate or redo basic tests.
 - [ ] Redo CI Workflows.
 
 #### Projects Using React-Grid-Layout

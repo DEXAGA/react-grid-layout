@@ -223,15 +223,13 @@ const ShowcaseLayout = (props: {
                               onLayoutChange={onLayoutChange}
                               onDrop={onDrop}
                               // WidthProvider option
-                              measureBeforeMount={false}
+                              measureBeforeMount={true}
                               // I like to have it animate on mount. If you don't, delete `useCSSTransforms` (it's default `true`)
                               // and set `measureBeforeMount={true}`.
                               useCSSTransforms={state.mounted}
                               compactType={state.compactType}
                               preventCollision={!state.compactType}
                               autoSize={true}
-                              // containerPadding={[10, paddingY]}
-                              // margin={[10, marginY]}
                               containerPadding={[paddingX, paddingY]}
                               margin={[marginX, marginY]}
                               rowHeight={state.height / 12 - marginY / 12 - paddingY / 12}

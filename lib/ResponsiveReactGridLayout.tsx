@@ -4,8 +4,9 @@ import * as React from "react";
 import isEqual from "lodash.isequal";
 
 import {cloneLayout, synchronizeLayoutWithChildren,} from "./utils";
-import {findOrGenerateResponsiveLayout, getBreakpointFromWidth, getColsFromBreakpoint,} from "./responsiveUtils";
+import {findOrGenerateResponsiveLayout, getBreakpointFromWidth,} from "./responsiveUtils";
 import ReactGridLayout from "./ReactGridLayout";
+import useSize from "./components/useSize";
 
 const type = (obj: any) => Object.prototype.toString.call(obj);
 
@@ -31,7 +32,6 @@ const ResponsiveReactGridLayout = (props) => {
   const generateInitialState = () => {
     let compactType = props.compactType;
     const breakpoint = getBreakpointFromWidth(props.breakpoints, props.width);
-    const colNo = getColsFromBreakpoint(breakpoint, props.cols);
     // verticalCompact compatibility, now deprecated
     compactType = props.verticalCompact === false ? null : compactType;
     // Get the initial layout. This can tricky; we try to generate one however possible if one doesn't exist
@@ -42,17 +42,20 @@ const ResponsiveReactGridLayout = (props) => {
               props.breakpoints,
               breakpoint,
               breakpoint,
-              colNo,
+              props.cols[breakpoint],
               compactType
       ),
       breakpoint: breakpoint,
-      cols: colNo
+      cols: props.cols[breakpoint]
     };
   }
 
   const [state, setState] = React.useState({
     ...generateInitialState()
   })
+
+  const parentRef = React.useRef();
+  const {width, height} = useSize(parentRef)
 
   React.useEffect(() => {
     return setState(prevState => {
@@ -107,7 +110,7 @@ const ResponsiveReactGridLayout = (props) => {
             props.breakpoint || getBreakpointFromWidth(props.breakpoints, props.width);
 
     const lastBreakpoint = state.breakpoint;
-    const newCols: number = getColsFromBreakpoint(newBreakpoint, props.cols);
+    const newCols: number = (props.cols)[newBreakpoint];
     const newLayouts = {...(props.layouts)};
 
     // Breakpoint change
@@ -169,24 +172,28 @@ const ResponsiveReactGridLayout = (props) => {
   }
 
   return (
-          <ReactGridLayout
-                  {...props}
-                  autoSize={props.autoSize}
-                  // children={props.children}
-                  compactType={props.compactType}
-                  height={props.height}
-                  innerRef={props.innerRef}
-                  onDrop={props.onDrop}
-                  preventCollision={props.preventCollision}
-                  rowHeight={props.rowHeight}
-                  useCSSTransforms={props.useCSSTransforms}
-                  width={props.width}
-                  margin={getIndentationValue(props.margin, state.breakpoint)}
-                  containerPadding={getIndentationValue(props.containerPadding, state.breakpoint)}
-                  onLayoutChange={onLayoutChange}
-                  layout={state.layout}
-                  cols={state.cols}
-          />
+          <div ref={parentRef}
+               style={{
+                 height: `100%`
+               }}>
+            <ReactGridLayout
+                    autoSize={props.autoSize}
+                    children={props.children}
+                    compactType={props.compactType}
+                    innerRef={props.innerRef}
+                    onDrop={props.onDrop}
+                    preventCollision={props.preventCollision}
+                    width={width}
+                    height={height}
+                    margin={getIndentationValue(props.margin, state.breakpoint)}
+                    containerPadding={getIndentationValue(props.containerPadding, state.breakpoint)}
+                    rowHeight={height / 12 - props.margin[1] / 12 - props.containerPadding[1] / 12}
+                    useCSSTransforms={props.useCSSTransforms}
+                    onLayoutChange={onLayoutChange}
+                    layout={state.layout}
+                    cols={state.cols}
+            />
+          </div>
   );
 }
 

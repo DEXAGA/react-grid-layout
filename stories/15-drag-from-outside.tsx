@@ -7,74 +7,18 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const DragFromOutsideLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layouts: {
-      lg:undefined
-    },
-    currentBreakpoint: undefined,
-    mounted: undefined,
-    compactType: undefined
+    layouts: {lg: generateLayout()},
+    currentBreakpoint: "lg",
+    compactType: "vertical",
+    mounted: false,
   })
 
   React.useEffect(() => {
-    setState({
-      currentBreakpoint: "lg",
-      compactType: "vertical",
+    setState(prevState => ({
+      ...prevState,
       mounted: true,
-      layouts: {lg: generateLayout()}
-    })
+    }))
   }, [])
-
-  const generateDOM = () => {
-    return _.map(state.layouts.lg, function(l, i) {
-      return (
-              <div key={i}
-                   className={l.static ? "static" : ""}>
-                {l.static ? (
-                        <span
-                                className="text"
-                                title="This item is static and cannot be removed or resized."
-                        >
-              Static - {i}
-            </span>
-                ) : (
-                        <span className="text">{i}</span>
-                )}
-              </div>
-      );
-    });
-  }
-
-  const onBreakpointChange = breakpoint => {
-    setState({
-       ...state,
-      currentBreakpoint: breakpoint
-    });
-  };
-
-  const onCompactTypeChange = () => {
-    const {compactType: oldCompactType} = state;
-    const compactType =
-            oldCompactType === "horizontal"
-                    ? "vertical"
-                    : oldCompactType === "vertical"
-                    ? null
-                    : "horizontal";
-    setState({...state,compactType});
-  };
-
-  const onLayoutChange = (layout, layouts) => {
-    props.onLayoutChange(layout, layouts);
-  };
-
-  const onNewLayout = () => {
-    setState({ ...state,
-      layouts: {lg: generateLayout()}
-    });
-  };
-
-  const onDrop = (layout, layoutItem, _event) => {
-    alert(`Dropped element props:\n${JSON.stringify(layoutItem, ['x', 'y', 'w', 'h'], 2)}`);
-  };
 
   return (
           <div>
@@ -88,8 +32,24 @@ const DragFromOutsideLayout = (props) => {
                         Compaction type:{" "}
                         {_.capitalize(state.compactType) || "No Compaction"}
                       </div>
-                      <button onClick={onNewLayout}>Generate New Layout</button>
-                      <button onClick={onCompactTypeChange}>
+                      <button onClick={() => {
+                        setState({
+                          ...state,
+                          layouts: {lg: generateLayout()}
+                        });
+                      }}>Generate New Layout</button>
+                      <button onClick={() => {
+                        const compactType =
+                                state.compactType === "horizontal"
+                                        ? "vertical"
+                                        : state.compactType === "vertical"
+                                        ? null
+                                        : "horizontal";
+                        setState(prevState => ({
+                          ...prevState,
+                          compactType
+                        }));
+                      }}>
                         Change Compaction Type
                       </button>
                       <div
@@ -107,9 +67,18 @@ const DragFromOutsideLayout = (props) => {
                       <ResponsiveReactGridLayout
                               {...props}
                               layouts={state.layouts}
-                              onBreakpointChange={onBreakpointChange}
-                              onLayoutChange={onLayoutChange}
-                              onDrop={onDrop}
+                              onBreakpointChange={breakpoint => {
+                                setState(prevState => ({
+                                  ...prevState,
+                                  currentBreakpoint: breakpoint
+                                }));
+                              }}
+                              onLayoutChange={(layout, layouts) => {
+                                props.onLayoutChange(layout, layouts);
+                              }}
+                              onDrop={(layout, layoutItem, _event) => {
+                                alert(`Dropped element props:\n${JSON.stringify(layoutItem, ['x', 'y', 'w', 'h'], 2)}`);
+                              }}
                               // WidthProvider option
                               measureBeforeMount={false}
                               // I like to have it animate on mount. If you don't, delete `useCSSTransforms` (it's default `true`)
@@ -119,7 +88,23 @@ const DragFromOutsideLayout = (props) => {
                               preventCollision={!state.compactType}
                               isDroppable={true}
                       >
-                        {generateDOM()}
+                        {_.map(state.layouts.lg, function(l, i) {
+                          return (
+                                  <div key={i}
+                                       className={l.static ? "static" : ""}>
+                                    {l.static ? (
+                                            <span
+                                                    className="text"
+                                                    title="This item is static and cannot be removed or resized."
+                                            >
+              Static - {i}
+            </span>
+                                    ) : (
+                                            <span className="text">{i}</span>
+                                    )}
+                                  </div>
+                          );
+                        })}
                       </ResponsiveReactGridLayout>
                     </React.Fragment>
             )}

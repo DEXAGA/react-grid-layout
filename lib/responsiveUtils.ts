@@ -1,8 +1,7 @@
 // @flow
 
-import { cloneLayout, compact, correctBounds } from "./utils";
-
-import type { CompactType, Layout } from "./utils";
+import type {Layout} from "./utils";
+import {cloneLayout, compact, correctBounds} from "./utils";
 
 /**
  * Given a width, find the highest breakpoint that matches is valid for it (width > breakpoint).
@@ -18,30 +17,11 @@ export function getBreakpointFromWidth(
   const sorted = sortBreakpoints(breakpoints);
   let matching = sorted[0];
   for (let i = 1, len = sorted.length; i < len; i++) {
-    const breakpointName = sorted[i];
-    if (width > breakpoints[breakpointName]) matching = breakpointName;
+    if (width > breakpoints[sorted[i]]) {
+      matching = sorted[i];
+    }
   }
   return matching;
-}
-
-/**
- * Given a breakpoint, get the # of cols set for it.
- * @param  {String} breakpoint Breakpoint name.
- * @param  {Object} cols       Map of breakpoints to cols.
- * @return {Number}            Number of cols.
- */
-export function getColsFromBreakpoint(
-  breakpoint: string,
-  cols: { [x: string]: number; }
-): number {
-  if (!cols[breakpoint]) {
-    throw new Error(
-      "ResponsiveReactGridLayout: `cols` entry for breakpoint " +
-        breakpoint +
-        " is missing!"
-    );
-  }
-  return cols[breakpoint];
 }
 
 /**

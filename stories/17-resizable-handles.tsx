@@ -1,67 +1,51 @@
 import React from "react";
 import _ from "lodash";
-import RGL, { WidthProvider } from "react-grid-layout-hooks";
+import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
 const ReactGridLayout = WidthProvider(RGL);
 
-export default class ResizableHandles extends React.PureComponent<any,any> {
-  static defaultProps = {
-    className: "layout",
-    items: 20,
-    rowHeight: 30,
-    onLayoutChange: function() {},
-    cols: 12
-  };
+const availableHandles = ["s", "w", "e", "n", "sw", "nw", "se", "ne"];
+const ResizableHandles = (props) => {
 
-  constructor(props) {
-    super(props);
-
-    const layout = this.generateLayout();
-    this.state = { layout };
-  }
-
-  generateDOM() {
-    return _.map(_.range(this.props.items), function(i) {
-      return (
-        <div key={i}>
-          <span className="text">{i}</span>
-        </div>
-      );
-    });
-  }
-
-  generateLayout() {
-    const p = this.props;
-    const availableHandles = ["s", "w", "e", "n", "sw", "nw", "se", "ne"];
-
-    return _.map(new Array(p.items), function(item, i) {
-      const y = _.result(p, "y") || Math.ceil(Math.random() * 4) + 1;
+  const [state, setState] = React.useState({
+    layout: _.map(new Array(props.items), function(item, i) {
+      const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
       return {
         x: (i * 2) % 12,
         y: Math.floor(i / 6) * y,
         w: 2,
         h: y,
         i: i.toString(),
-        resizeHandles: _.shuffle(availableHandles).slice(0, _.random(1, availableHandles.length-1))
+        resizeHandles: _.shuffle(availableHandles).slice(0, _.random(1, availableHandles.length - 1))
       };
-    });
-  }
+    })
+  });
 
-  onLayoutChange(layout) {
-    this.props.onLayoutChange(layout);
-  }
-
-  render() {
-    return (
+  return (
       <ReactGridLayout
-
-        layout={this.state.layout}
-        onLayoutChange={this.onLayoutChange}
-        {...this.props}
+        layout={state.layout}
+        onLayoutChange={(layout) => {
+          props.onLayoutChange(layout);
+        }}
+        {...props}
       >
-        {this.generateDOM()}
+        {_.map(_.range(props.items), function(i) {
+          return (
+                  <div key={i}>
+                    <span className="text">{i}</span>
+                  </div>
+          );
+        })}
       </ReactGridLayout>
     );
-  }
 }
 
+ResizableHandles.defaultProps = {
+  className: "layout",
+  items: 20,
+  rowHeight: 30,
+  onLayoutChange: function() {},
+  cols: 12
+};
+
+export default ResizableHandles

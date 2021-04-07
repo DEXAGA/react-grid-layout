@@ -4,22 +4,37 @@ import _ from "lodash";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
+function newLayout(prevState) {
+  let lg = prevState.layouts.lg
+  lg.push({
+    i: "n" + prevState.newCounter,
+    x: (prevState.layouts.lg.length * 2) % (prevState.cols || 12),
+    y: Infinity, // puts it at the bottom
+    w: 2,
+    h: 2
+  })
+  return {
+    lg: lg
+  };
+}
+
 /**
  * This layout demonstrates how to use a grid with a dynamic number of elements.
  */
 const AddRemoveLayout = (props) => {
-
   const [state, setState] = React.useState({
-    items: [0, 1, 2, 3, 4].map(function(i, key, list) {
-      return {
-        i: i.toString(),
-        x: i * 2,
-        y: 0,
-        w: 2,
-        h: 2,
-        add: i === (list.length - 1)
-      };
-    }),
+    layouts: {
+      lg: [0, 1, 2, 3, 4].map(function(i, key, list) {
+        return {
+          i: i.toString(),
+          x: i * 2,
+          y: 0,
+          w: 2,
+          h: 2,
+          add: i === (list.length - 1)
+        };
+      })
+    },
     newCounter: 0
   })
 
@@ -31,15 +46,9 @@ const AddRemoveLayout = (props) => {
               setState(prevState => ({
                 ...prevState,
                 // Add a new item. It must have a unique key!
-                items: state.items.concat({
-                  i: "n" + state.newCounter,
-                  x: (state.items.length * 2) % (state.cols || 12),
-                  y: Infinity, // puts it at the bottom
-                  w: 2,
-                  h: 2
-                }),
+                layouts: newLayout(prevState),
                 // Increment the counter to ensure key is always unique.
-                newCounter: state.newCounter + 1
+                newCounter: prevState.newCounter + 1
               }));
             }}>
               Add Item
@@ -59,10 +68,10 @@ const AddRemoveLayout = (props) => {
                         cols: cols
                       }));
                     }}
-                    layouts={{lg: state.items}}
+                    layouts={state.layouts}
                     {...props}
             >
-              {state.items.map(el => {
+              {state?.layouts?.lg.map(el => {
                 let i = el.add ? "+" : el.i;
                 return (
                         <div key={i}>
@@ -75,15 +84,9 @@ const AddRemoveLayout = (props) => {
                                             setState(prevState => ({
                                               ...prevState,
                                               // Add a new item. It must have a unique key!
-                                              items: state.items.concat({
-                                                i: "n" + state.newCounter,
-                                                x: (state.items.length * 2) % (state.cols || 12),
-                                                y: Infinity, // puts it at the bottom
-                                                w: 2,
-                                                h: 2
-                                              }),
+                                              layouts: newLayout(prevState),
                                               // Increment the counter to ensure key is always unique.
-                                              newCounter: state.newCounter + 1
+                                              newCounter: prevState.newCounter + 1
                                             }));
                                           }}
                                           title="You can add an item by clicking here, too."
@@ -105,7 +108,7 @@ const AddRemoveLayout = (props) => {
                                     console.log("removing", i);
                                     setState(prevState => ({
                                       ...prevState,
-                                      items: _.reject(state.items, {i: i})
+                                      layouts: {lg: _.reject(prevState.layouts.lg, {i: i})}
                                     }));
                                   }}
                           >

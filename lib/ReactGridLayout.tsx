@@ -50,13 +50,220 @@ try {
   /* Ignore */
 }
 
+function getOnDragStop(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void, onLayoutMaybeChanged: (newLayout: Layout, oldLayout: (Layout | null)) => void) {
+  return (
+          i: string,
+          x: number,
+          y: number,
+          {e, node}: GridDragEvent
+  ): void => {
+    if (!state.activeDrag) return;
+
+    const {oldDragItem} = state;
+    let {layout} = state;
+    const {cols, preventCollision} = props;
+    const l = layout.find(((value, index) => layout[index].i === i));
+    if (!l) return;
+
+    // Move the element here
+    const isUserAction = true;
+    layout = moveElement(layout, l, x, y, isUserAction, preventCollision, compactType(props), cols);
+
+    props.onDragStop(layout, oldDragItem, l, null, e, node);
+
+    // Set state
+    const newLayout = compact(layout, compactType(props), cols);
+    const {oldLayout} = state;
+    setState(prevState => ({
+      ...prevState,
+      activeDrag: null,
+      layout: newLayout,
+      oldDragItem: null,
+      oldLayout: null
+    }));
+
+    // @ts-ignore
+    onLayoutMaybeChanged(newLayout, oldLayout);
+  };
+}
+
+function getOnDragStart(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }) {
+  return (
+          i: string,
+          x: number,
+          y: number,
+          {e, node}: GridDragEvent
+  ): void => {
+    const {layout} = state;
+    const l = layout.find(((value, index) => layout[index].i === i));
+    if (!l) return;
+
+    // @ts-ignore
+    setState(prevState => ({
+      ...prevState,
+      oldDragItem: {
+        ...(l)
+      },
+      oldLayout: state.layout
+    }));
+
+    return props.onDragStart(layout, l, l, null, e, node);
+  };
+}
+
+function getOnDrag(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void) {
+  return (i: string, x: number, y: number, {e, node}: GridDragEvent): void => {
+    const {oldDragItem} = state;
+    let {layout} = state;
+    const {cols} = props;
+    const l = layout.find(((value, index) => layout[index].i === i));
+    if (!l) return;
+
+    // Create placeholder (display only)
+    const placeholder = {
+      w: l.w,
+      h: l.h,
+      x: l.x,
+      y: l.y,
+      placeholder: true,
+      i: i
+    };
+
+    // Move the element to the dragged location.
+    const isUserAction = true;
+    layout = moveElement(layout, l, x, y, isUserAction, props.preventCollision, compactType(props), cols);
+
+    props.onDrag(layout, oldDragItem, l, placeholder, e, node);
+
+    // @ts-ignore
+    setState(prevState => ({
+      ...prevState,
+      layout: compact(layout, compactType(props), cols),
+      activeDrag: placeholder
+    }));
+  };
+}
+
+function getOnResizeStart(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }) {
+  return (i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
+    const l = state.layout.find(((value, index) => (state.layout)[index].i === i));
+    if (!l) return;
+
+    // @ts-ignore
+    setState(prevState => ({
+      ...prevState,
+      oldResizeItem: {
+        ...(l)
+      },
+      oldLayout: state.layout
+    }));
+
+    props.onResizeStart(state.layout, l, l, null, e, node);
+  };
+}
+
+function getOnResize(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void) {
+  return (i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
+
+    const [newLayout, l] = withLayoutItem(state.layout, i, (l: { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }) => {
+      // Something like quad tree should be used
+      // to find collisions faster
+      let hasCollisions;
+      if (props.preventCollision) {
+        const collisions = getAllCollisions(state.layout, {...l, w, h}).filter(
+                layoutItem => layoutItem.i !== l.i
+        );
+        hasCollisions = collisions.length > 0;
+
+        // If we're colliding, we need adjust the placeholder.
+        if (hasCollisions) {
+          // adjust w && h to maximum allowed space
+          let leastX = Infinity,
+                  leastY = Infinity;
+          collisions.forEach(layoutItem => {
+            if (layoutItem.x > l.x) leastX = Math.min(leastX, layoutItem.x);
+            if (layoutItem.y > l.y) leastY = Math.min(leastY, layoutItem.y);
+          });
+
+          if (Number.isFinite(leastX)) l.w = leastX - l.x;
+          if (Number.isFinite(leastY)) l.h = leastY - l.y;
+        }
+      }
+
+      if (!hasCollisions) {
+        // Set new width and height.
+        l.w = w;
+        l.h = h;
+      }
+
+      return l;
+    });
+
+    // Shouldn't ever happen, but typechecking makes it necessary
+    if (!l) return;
+
+    // Create placeholder element (display only)
+    let placeholder: { static: boolean; w: any; h: any; x: any; y: any; i: string };
+    placeholder = {
+      // @ts-ignore
+      "w": l.w,
+      // @ts-ignore
+      "h": l.h,
+      // @ts-ignore
+      "x": l.x,
+      // @ts-ignore
+      "y": l.y,
+      "static": true,
+      "i": i
+    };
+
+    props.onResize(newLayout, state.oldResizeItem, l, placeholder, e, node);
+
+    // Re-compact the newLayout and set the drag placeholder.
+    // @ts-ignore
+    // @ts-ignore
+    setState(prevState => ({
+      ...prevState,
+      layout: compact(newLayout, compactType(props), props.cols),
+      activeDrag: placeholder
+    }));
+  };
+}
+
+function getOnResizeStop(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void, onLayoutMaybeChanged: (newLayout: Layout, oldLayout: (Layout | null)) => void) {
+  return (i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
+    const {layout, oldResizeItem} = state;
+    const {cols} = props;
+    const l = layout.find(((value, index) => layout[index].i === i));
+
+    props.onResizeStop(layout, oldResizeItem, l, null, e, node);
+
+    // Set state
+    const newLayout = compact(layout, compactType(props), cols);
+    const {oldLayout} = state;
+    setState(prevState => ({
+      ...prevState,
+      activeDrag: null,
+      layout: newLayout,
+      oldResizeItem: null,
+      oldLayout: null
+    }));
+
+    onLayoutMaybeChanged(newLayout, oldLayout);
+  };
+}
+
+function getGridItemByValue(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, value1) {
+  return state.layout.find(((value, index) => (state.layout)[index].i === String(value1)));
+}
+
 /**
  * A reactive, fluid grid layout with draggable, resizable components.
  */
 
 const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any; }) => {
 
-  const initialState = {
+  const [state, setState] = React.useState({
     activeDrag: null,
     layout: synchronizeLayoutWithChildren(
             props.layout,
@@ -71,11 +278,17 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
     oldResizeItem: null,
     droppingDOMNode: null,
     children: []
-  };
-
-  const [state, setState] = React.useState(initialState)
+  })
 
   const [dragEnterCounter, setDragEnterCounter] = React.useState(0)
+
+  const onLayoutMaybeChanged = (newLayout: Layout, oldLayout: Layout | null) => {
+    if (!oldLayout) oldLayout = state.layout;
+
+    if (!isEqual(oldLayout, newLayout)) {
+      props.onLayoutChange(newLayout);
+    }
+  }
 
   React.useEffect(() => {
     setState(prevState => ({
@@ -84,12 +297,15 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
     }));
     // Possibly call back with layout on mount. This should be done after correcting the layout width
     // to ensure we don't rerender with the wrong width.
-    props.onLayoutChange(state.layout);
+    onLayoutMaybeChanged(state.layout, props.layout);
   }, [])
 
   React.useEffect(() => {
+    const newLayout = state.layout;
+    const oldLayout = state.layout;
+
     if (!state.activeDrag) {
-      props.onLayoutChange(state.layout);
+      onLayoutMaybeChanged(newLayout, oldLayout);
     }
   })
 
@@ -140,30 +356,49 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
     })
   })
 
-  /**
-   * Calculates a pixel value for the container.
-   * @return {String} Container height in pixels.
-   */
-  const containerHeight = () => {
-    if (!props.autoSize) return;
+
+  let height;
+  if (props.autoSize) {
     const nbRow = bottom(state.layout);
-    const height = nbRow * props.rowHeight +
+    height = nbRow * props.rowHeight +
             props.margin[1] +
             props.containerPadding[1] +
             "px";
-    return height !== undefined && height !== null ? height : props.height;
+  } else {
+    height = props.height
   }
 
-  // console.log(props.height)
 
+
+  let gridItem = getGridItemByValue(state, state.droppingDOMNode?.key)
+  let isDraggable = typeof gridItem?.isDraggable === "boolean"
+          ? gridItem?.isDraggable
+          : !gridItem?.static && props.isDraggable;
+  let isResizable = typeof gridItem?.isResizable === "boolean"
+          ? gridItem?.isResizable
+          : !gridItem?.static && props.isResizable;
+  let isBounded = (typeof gridItem?.isDraggable === "boolean"
+          ? gridItem?.isDraggable
+          : !gridItem?.static && props.isDraggable) && props.isBounded && gridItem?.isBounded !== false;
+  let w = gridItem?.w;
+  let h = gridItem?.h;
+  let x = gridItem?.x;
+  let y = gridItem?.y;
+  let i = gridItem?.i;
+  let minH = gridItem?.minH;
+  let minW = gridItem?.minW;
+  let maxH = gridItem?.maxH;
+  let maxW = gridItem?.maxW;
+  let isStatic = gridItem?.static;
+  let resizeHandles = gridItem?.resizeHandles || props.resizeHandles;
   return (
           <div
                   ref={props.innerRef}
                   className={classNames(layoutClassName, props.className)}
-                  style={Object.assign(
-                          {height: containerHeight()},
-                          props.style
-                  )}
+                  style={{
+                    height: height,
+                    ...props.style
+                  }}
                   // @ts-ignore
                   onDrop={props.isDroppable ? (e: Event) => {
                     const item = state.layout.find(l => l.i === props.droppingItem.i);
@@ -291,226 +526,48 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                   }}
           >
             {React.Children.map(props.children, child => {
-                      return (child && child.key && state.layout.find(((value, index) => (state.layout)[index].i === String(child.key)))) && (
+                      const gridItem = getGridItemByValue(state, child.key)
+                      return (child && child.key && gridItem) && (
                               <GridItem
+                                      layout={props.layout}
                                       containerWidth={props.width}
                                       containerHeight={props.height}
                                       cols={props.cols}
                                       margin={props.margin}
-                                      containerPadding={props.margin}
+                                      containerPadding={props.containerPadding}
                                       maxRows={props.maxRows}
                                       rowHeight={props.rowHeight}
                                       cancel={props.draggableCancel}
                                       handle={props.draggableHandle}
-                                      onDragStop={(
-                                              i: string,
-                                              x: number,
-                                              y: number,
-                                              {e, node}: GridDragEvent
-                                      ): void => {
-                                        if (!state.activeDrag) return;
-
-                                        const {oldDragItem} = state;
-                                        let {layout} = state;
-                                        const {cols, preventCollision} = props;
-                                        const l = layout.find(((value, index) => layout[index].i === i));
-                                        if (!l) return;
-
-                                        // Move the element here
-                                        const isUserAction = true;
-                                        layout = moveElement(layout, l, x, y, isUserAction, preventCollision, compactType(props), cols);
-
-                                        props.onDragStop(layout, oldDragItem, l, null, e, node);
-
-                                        // Set state
-                                        const newLayout = compact(layout, compactType(props), cols);
-                                        const {oldLayout} = state;
-                                        setState(prevState => ({
-                                          ...prevState,
-                                          activeDrag: null,
-                                          layout: newLayout,
-                                          oldDragItem: null,
-                                          oldLayout: null
-                                        }));
-
-                                        // @ts-ignore
-                                        props.onLayoutChange(newLayout);
-                                      }}
-                                      onDragStart={(
-                                              i: string,
-                                              x: number,
-                                              y: number,
-                                              {e, node}: GridDragEvent
-                                      ): void => {
-                                        const {layout} = state;
-                                        const l = layout.find(((value, index) => layout[index].i === i));
-                                        if (!l) return;
-
-                                        // @ts-ignore
-                                        setState(prevState => ({
-                                          ...prevState,
-                                          oldDragItem: {
-                                            ...(l)
-                                          },
-                                          oldLayout: state.layout
-                                        }));
-
-                                        return props.onDragStart(layout, l, l, null, e, node);
-                                      }}
-                                      onDrag={(i: string, x: number, y: number, {e, node}: GridDragEvent): void => {
-                                        const {oldDragItem} = state;
-                                        let {layout} = state;
-                                        const {cols} = props;
-                                        const l = layout.find(((value, index) => layout[index].i === i));
-                                        if (!l) return;
-
-                                        // Create placeholder (display only)
-                                        const placeholder = {
-                                          w: l.w,
-                                          h: l.h,
-                                          x: l.x,
-                                          y: l.y,
-                                          placeholder: true,
-                                          i: i
-                                        };
-
-                                        // Move the element to the dragged location.
-                                        const isUserAction = true;
-                                        layout = moveElement(layout, l, x, y, isUserAction, props.preventCollision, compactType(props), cols);
-
-                                        props.onDrag(layout, oldDragItem, l, placeholder, e, node);
-
-                                        // @ts-ignore
-                                        setState(prevState => ({
-                                          ...prevState,
-                                          layout: compact(layout, compactType(props), cols),
-                                          activeDrag: placeholder
-                                        }));
-                                      }}
-                                      onResizeStart={(i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
-                                        const l = state.layout.find(((value, index) => (state.layout)[index].i === i));
-                                        if (!l) return;
-
-                                        // @ts-ignore
-                                        setState(prevState => ({
-                                          ...prevState,
-                                          oldResizeItem: {
-                                            ...(l)
-                                          },
-                                          oldLayout: state.layout
-                                        }));
-
-                                        props.onResizeStart(state.layout, l, l, null, e, node);
-                                      }}
-                                      onResize={(i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
-
-                                        const [newLayout, l] = withLayoutItem(state.layout, i, (l: { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }) => {
-                                          // Something like quad tree should be used
-                                          // to find collisions faster
-                                          let hasCollisions;
-                                          if (props.preventCollision) {
-                                            const collisions = getAllCollisions(state.layout, {...l, w, h}).filter(
-                                                    layoutItem => layoutItem.i !== l.i
-                                            );
-                                            hasCollisions = collisions.length > 0;
-
-                                            // If we're colliding, we need adjust the placeholder.
-                                            if (hasCollisions) {
-                                              // adjust w && h to maximum allowed space
-                                              let leastX = Infinity,
-                                                      leastY = Infinity;
-                                              collisions.forEach(layoutItem => {
-                                                if (layoutItem.x > l.x) leastX = Math.min(leastX, layoutItem.x);
-                                                if (layoutItem.y > l.y) leastY = Math.min(leastY, layoutItem.y);
-                                              });
-
-                                              if (Number.isFinite(leastX)) l.w = leastX - l.x;
-                                              if (Number.isFinite(leastY)) l.h = leastY - l.y;
-                                            }
-                                          }
-
-                                          if (!hasCollisions) {
-                                            // Set new width and height.
-                                            l.w = w;
-                                            l.h = h;
-                                          }
-
-                                          return l;
-                                        });
-
-                                        // Shouldn't ever happen, but typechecking makes it necessary
-                                        if (!l) return;
-
-                                        // Create placeholder element (display only)
-                                        let placeholder: { static: boolean; w: any; h: any; x: any; y: any; i: string };
-                                        placeholder = {
-                                          // @ts-ignore
-                                          "w": l.w,
-                                          // @ts-ignore
-                                          "h": l.h,
-                                          // @ts-ignore
-                                          "x": l.x,
-                                          // @ts-ignore
-                                          "y": l.y,
-                                          "static": true,
-                                          "i": i
-                                        };
-
-                                        props.onResize(newLayout, state.oldResizeItem, l, placeholder, e, node);
-
-                                        // Re-compact the newLayout and set the drag placeholder.
-                                        // @ts-ignore
-                                        // @ts-ignore
-                                        setState(prevState => ({
-                                          ...prevState,
-                                          layout: compact(newLayout, compactType(props), props.cols),
-                                          activeDrag: placeholder
-                                        }));
-                                      }}
-                                      onResizeStop={(i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
-                                        const {layout, oldResizeItem} = state;
-                                        const {cols} = props;
-                                        const l = layout.find(((value, index) => layout[index].i === i));
-
-                                        props.onResizeStop(layout, oldResizeItem, l, null, e, node);
-
-                                        // Set state
-                                        const newLayout = compact(layout, compactType(props), cols);
-                                        const {oldLayout} = state;
-                                        setState(prevState => ({
-                                          ...prevState,
-                                          activeDrag: null,
-                                          layout: newLayout,
-                                          oldResizeItem: null,
-                                          oldLayout: null
-                                        }));
-
-                                        props.onLayoutChange(newLayout);
-                                      }}
-                                      isDraggable={typeof state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isDraggable === "boolean"
-                                              ? state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isDraggable
-                                              : !state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).static && props.isDraggable}
-                                      isResizable={typeof state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isResizable === "boolean"
-                                              ? state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isResizable
-                                              : !state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).static && props.isResizable}
-                                      isBounded={(typeof state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isDraggable === "boolean"
-                                              ? state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isDraggable
-                                              : !state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).static && props.isDraggable) && props.isBounded && state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).isBounded !== false}
+                                      onDragStop={getOnDragStop(state, props, setState, onLayoutMaybeChanged)}
+                                      onDragStart={getOnDragStart(state, setState, props)}
+                                      onDrag={getOnDrag(state, props, setState)}
+                                      onResizeStart={getOnResizeStart(state, setState, props)}
+                                      onResize={getOnResize(state, props, setState)}
+                                      onResizeStop={getOnResizeStop(state, props, setState, onLayoutMaybeChanged)}
+                                      isDraggable={typeof gridItem?.isDraggable === "boolean"
+                                              ? gridItem?.isDraggable
+                                              : !gridItem?.static && props.isDraggable}
+                                      isResizable={typeof gridItem?.isResizable === "boolean"
+                                              ? gridItem?.isResizable
+                                              : !gridItem?.static && props.isResizable}
+                                      isBounded={(typeof gridItem?.isDraggable === "boolean"
+                                              ? gridItem?.isDraggable
+                                              : !gridItem?.static && props.isDraggable) && props.isBounded && gridItem?.isBounded !== false}
                                       useCSSTransforms={props.useCSSTransforms && state.mounted}
                                       usePercentages={!state.mounted}
                                       transformScale={props.transformScale}
-                                      w={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).w}
-                                      h={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).h}
-                                      x={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).x}
-                                      y={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).y}
-                                      i={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).i}
-                                      minH={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).minH}
-                                      minW={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).minW}
-                                      maxH={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).maxH}
-                                      maxW={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).maxW}
-                                      static={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).static}
-                                      droppingPosition={false ? state.droppingPosition : undefined}
-                                      resizeHandles={state.layout.find(((value, index) => (state.layout)[index].i === String(child.key))).resizeHandles || props.resizeHandles}
+                                      w={gridItem?.w}
+                                      h={gridItem?.h}
+                                      x={gridItem?.x}
+                                      y={gridItem?.y}
+                                      i={gridItem?.i}
+                                      minH={gridItem?.minH}
+                                      minW={gridItem?.minW}
+                                      maxH={gridItem?.maxH}
+                                      maxW={gridItem?.maxW}
+                                      static={gridItem?.static}
+                                      resizeHandles={gridItem?.resizeHandles || props.resizeHandles}
                                       resizeHandle={props.resizeHandle}
                               >
                                 {child}
@@ -519,229 +576,43 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                     }
             )}
             {props.isDroppable &&
-            state.droppingDOMNode &&
-            state.droppingDOMNode &&
-            state.droppingDOMNode.key &&
-            state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))) && (
+            state.droppingDOMNode?.key &&
+            gridItem && (
                     <GridItem
+                            layout={props.layout}
                             containerWidth={props.width}
                             containerHeight={props.height}
                             cols={props.cols}
                             margin={props.margin}
-                            containerPadding={props.margin}
+                            containerPadding={props.containerPadding}
                             maxRows={props.maxRows}
                             rowHeight={props.rowHeight}
                             cancel={props.draggableCancel}
                             handle={props.draggableHandle}
-                            onDragStop={(
-                                    i: string,
-                                    x: number,
-                                    y: number,
-                                    {e, node}: GridDragEvent
-                            ): void => {
-                              if (!state.activeDrag) return;
-
-                              const {oldDragItem} = state;
-                              let {layout} = state;
-                              const {cols, preventCollision} = props;
-                              const l = layout.find(((value, index) => layout[index].i === i));
-                              if (!l) return;
-
-                              // Move the element here
-                              const isUserAction = true;
-                              layout = moveElement(layout, l, x, y, isUserAction, preventCollision, compactType(props), cols);
-
-                              props.onDragStop(layout, oldDragItem, l, null, e, node);
-
-                              // Set state
-                              const newLayout = compact(layout, compactType(props), cols);
-                              const {oldLayout} = state;
-                              setState(prevState => ({
-                                ...prevState,
-                                activeDrag: null,
-                                layout: newLayout,
-                                oldDragItem: null,
-                                oldLayout: null
-                              }));
-
-                              // @ts-ignore
-                              props.onLayoutChange(newLayout);
-                            }}
-                            onDragStart={(
-                                    i: string,
-                                    x: number,
-                                    y: number,
-                                    {e, node}: GridDragEvent
-                            ): void => {
-                              const {layout} = state;
-                              const l = layout.find(((value, index) => layout[index].i === i));
-                              if (!l) return;
-
-                              // @ts-ignore
-                              setState(prevState => ({
-                                ...prevState,
-                                oldDragItem: {
-                                  ...(l)
-                                },
-                                oldLayout: state.layout
-                              }));
-
-                              return props.onDragStart(layout, l, l, null, e, node);
-                            }}
-                            onDrag={(i: string, x: number, y: number, {e, node}: GridDragEvent): void => {
-                              const {oldDragItem} = state;
-                              let {layout} = state;
-                              const {cols} = props;
-                              const l = layout.find(((value, index) => layout[index].i === i));
-                              if (!l) return;
-
-                              // Create placeholder (display only)
-                              const placeholder = {
-                                w: l.w,
-                                h: l.h,
-                                x: l.x,
-                                y: l.y,
-                                placeholder: true,
-                                i: i
-                              };
-
-                              // Move the element to the dragged location.
-                              const isUserAction = true;
-                              layout = moveElement(layout, l, x, y, isUserAction, props.preventCollision, compactType(props), cols);
-
-                              props.onDrag(layout, oldDragItem, l, placeholder, e, node);
-
-                              // @ts-ignore
-                              setState(prevState => ({
-                                ...prevState,
-                                layout: compact(layout, compactType(props), cols),
-                                activeDrag: placeholder
-                              }));
-                            }}
-                            onResizeStart={(i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
-                              const l = state.layout.find(((value, index) => (state.layout)[index].i === i));
-                              if (!l) return;
-
-                              // @ts-ignore
-                              setState(prevState => ({
-                                ...prevState,
-                                oldResizeItem: {
-                                  ...(l)
-                                },
-                                oldLayout: state.layout
-                              }));
-
-                              props.onResizeStart(state.layout, l, l, null, e, node);
-                            }}
-                            onResize={(i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
-
-                              const [newLayout, l] = withLayoutItem(state.layout, i, (l: { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }) => {
-                                // Something like quad tree should be used
-                                // to find collisions faster
-                                let hasCollisions;
-                                if (props.preventCollision) {
-                                  const collisions = getAllCollisions(state.layout, {...l, w, h}).filter(
-                                          layoutItem => layoutItem.i !== l.i
-                                  );
-                                  hasCollisions = collisions.length > 0;
-
-                                  // If we're colliding, we need adjust the placeholder.
-                                  if (hasCollisions) {
-                                    // adjust w && h to maximum allowed space
-                                    let leastX = Infinity,
-                                            leastY = Infinity;
-                                    collisions.forEach(layoutItem => {
-                                      if (layoutItem.x > l.x) leastX = Math.min(leastX, layoutItem.x);
-                                      if (layoutItem.y > l.y) leastY = Math.min(leastY, layoutItem.y);
-                                    });
-
-                                    if (Number.isFinite(leastX)) l.w = leastX - l.x;
-                                    if (Number.isFinite(leastY)) l.h = leastY - l.y;
-                                  }
-                                }
-
-                                if (!hasCollisions) {
-                                  // Set new width and height.
-                                  l.w = w;
-                                  l.h = h;
-                                }
-
-                                return l;
-                              });
-
-                              // Shouldn't ever happen, but typechecking makes it necessary
-                              if (!l) return;
-
-                              // Create placeholder element (display only)
-                              let placeholder: { static: boolean; w: any; h: any; x: any; y: any; i: string };
-                              placeholder = {
-                                // @ts-ignore
-                                "w": l.w,
-                                // @ts-ignore
-                                "h": l.h,
-                                // @ts-ignore
-                                "x": l.x,
-                                // @ts-ignore
-                                "y": l.y,
-                                "static": true,
-                                "i": i
-                              };
-
-                              props.onResize(newLayout, state.oldResizeItem, l, placeholder, e, node);
-
-                              // Re-compact the newLayout and set the drag placeholder.
-                              // @ts-ignore
-                              // @ts-ignore
-                              setState(prevState => ({
-                                ...prevState,
-                                layout: compact(newLayout, compactType(props), props.cols),
-                                activeDrag: placeholder
-                              }));
-                            }}
-                            onResizeStop={(i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
-                              const {layout, oldResizeItem} = state;
-                              const {cols} = props;
-                              const l = layout.find(((value, index) => layout[index].i === i));
-
-                              props.onResizeStop(layout, oldResizeItem, l, null, e, node);
-
-                              // Set state
-                              const newLayout = compact(layout, compactType(props), cols);
-                              const {oldLayout} = state;
-                              setState(prevState => ({
-                                ...prevState,
-                                activeDrag: null,
-                                layout: newLayout,
-                                oldResizeItem: null,
-                                oldLayout: null
-                              }));
-
-                              props.onLayoutChange(newLayout);
-                            }}
-                            isDraggable={typeof state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isDraggable === "boolean"
-                                    ? state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isDraggable
-                                    : !state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).static && props.isDraggable}
-                            isResizable={typeof state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isResizable === "boolean"
-                                    ? state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isResizable
-                                    : !state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).static && props.isResizable}
-                            isBounded={(typeof state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isDraggable === "boolean"
-                                    ? state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isDraggable
-                                    : !state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).static && props.isDraggable) && props.isBounded && state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).isBounded !== false}
+                            onDragStop={getOnDragStop(state, props, setState, onLayoutMaybeChanged)}
+                            onDragStart={getOnDragStart(state, setState, props)}
+                            onDrag={getOnDrag(state, props, setState)}
+                            onResizeStart={getOnResizeStart(state, setState, props)}
+                            onResize={getOnResize(state, props, setState)}
+                            onResizeStop={getOnResizeStop(state, props, setState, onLayoutMaybeChanged)}
+                            isDraggable={isDraggable}
+                            isResizable={isResizable}
+                            isBounded={isBounded}
                             useCSSTransforms={props.useCSSTransforms && state.mounted}
                             usePercentages={!state.mounted}
                             transformScale={props.transformScale}
-                            w={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).w}
-                            h={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).h}
-                            x={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).x}
-                            y={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).y}
-                            i={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).i}
-                            minH={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).minH}
-                            minW={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).minW}
-                            maxH={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).maxH}
-                            maxW={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).maxW}
-                            static={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).static}
-                            droppingPosition={true ? state.droppingPosition : undefined}
-                            resizeHandles={state.layout.find(((value, index) => (state.layout)[index].i === String(state.droppingDOMNode.key))).resizeHandles || props.resizeHandles}
+                            w={w}
+                            h={h}
+                            x={x}
+                            y={y}
+                            i={i}
+                            minH={minH}
+                            minW={minW}
+                            maxH={maxH}
+                            maxW={maxW}
+                            static={isStatic}
+                            droppingPosition={state.droppingPosition}
+                            resizeHandles={resizeHandles}
                             resizeHandle={props.resizeHandle}
                     >
                       {state.droppingDOMNode}
@@ -759,7 +630,7 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                             containerHeight={props.height}
                             cols={props.cols}
                             margin={props.margin}
-                            containerPadding={props.margin}
+                            containerPadding={props.containerPadding}
                             maxRows={props.maxRows}
                             rowHeight={props.rowHeight}
                             isDraggable={false}

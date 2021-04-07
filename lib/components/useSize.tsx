@@ -37,7 +37,7 @@ const useSize = (elementRef) => {
     }
   }, [])
 
-  return {...state}
+  return [state]
 };
 
 useSize.defaultProps = {

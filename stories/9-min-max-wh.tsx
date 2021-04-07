@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout = RGL;
 
 const MinMaxLayout = (props) => {
   return (

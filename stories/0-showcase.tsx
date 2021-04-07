@@ -3,7 +3,7 @@ import * as React from "react";
 import RGL from 'react-grid-layout-hooks/lib/ResponsiveReactGridLayout';
 import {WidthProvider} from "../index";
 
-const ResponsiveReactGridLayout = WidthProvider(RGL);
+const ResponsiveReactGridLayout = RGL;
 
 const ShowcaseLayout = (props: {
   className?: "layout",

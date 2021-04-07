@@ -23,6 +23,7 @@ import {
   synchronizeLayoutWithChildren,
   withLayoutItem
 } from "./utils";
+import useSize from "./components/useSize";
 
 type State = {
   activeDrag: LayoutItem,
@@ -263,6 +264,9 @@ function getGridItemByValue(state: { layout: Readonly<LayoutItem>[]; oldDragItem
 
 const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any; }) => {
 
+  const containerRef = React.useRef()
+  const [{width}] = useSize(containerRef)
+
   const [state, setState] = React.useState({
     activeDrag: null,
     layout: synchronizeLayoutWithChildren(
@@ -369,7 +373,6 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
   }
 
 
-
   let gridItem = getGridItemByValue(state, state.droppingDOMNode?.key)
   let isDraggable = typeof gridItem?.isDraggable === "boolean"
           ? gridItem?.isDraggable
@@ -393,45 +396,25 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
   let resizeHandles = gridItem?.resizeHandles || props.resizeHandles;
   return (
           <div
-                  ref={props.innerRef}
-                  className={classNames(layoutClassName, props.className)}
+                  ref={containerRef}
                   style={{
-                    height: height,
-                    ...props.style
-                  }}
-                  // @ts-ignore
-                  onDrop={props.isDroppable ? (e: Event) => {
-                    const item = state.layout.find(l => l.i === props.droppingItem.i);
+                    height: `100%`,
+                    width: `100%`
+                  }}>
+            <div
+                    ref={props.innerRef}
+                    className={classNames(layoutClassName, props.className)}
+                    style={{
+                      height: height,
+                      ...props.style
+                    }}
+                    // @ts-ignore
+                    onDrop={props.isDroppable ? (e: Event) => {
+                      const item = state.layout.find(l => l.i === props.droppingItem.i);
 
-                    // reset dragEnter counter on drop
-                    setDragEnterCounter(0);
+                      // reset dragEnter counter on drop
+                      setDragEnterCounter(0);
 
-                    const newLayout = compact(
-                            state.layout.filter(l => l.i !== props.droppingItem.i),
-                            compactType(props),
-                            props.cols
-                    );
-
-                    setState(prevState => ({
-                      ...prevState,
-                      layout: newLayout,
-                      droppingDOMNode: null,
-                      activeDrag: null,
-                      droppingPosition: undefined
-                    }));
-
-                    props.onDrop(state.layout, item, e);
-                  } : () => {
-                  }}
-                  onDragLeave={props.isDroppable ? () => {
-                    setDragEnterCounter(prevState => prevState--)
-
-                    // onDragLeave can be triggered on each layout's child.
-                    // But we know that count of dragEnter and dragLeave events
-                    // will be balanced after leaving the layout's container
-                    // so we can increase and decrease count of dragEnter and
-                    // when it'll be equal to 0 we'll remove the placeholder
-                    if (dragEnterCounter === 0) {
                       const newLayout = compact(
                               state.layout.filter(l => l.i !== props.droppingItem.i),
                               compactType(props),
@@ -445,203 +428,230 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                         activeDrag: null,
                         droppingPosition: undefined
                       }));
-                    }
-                  } : () => {
-                  }}
-                  onDragEnter={props.isDroppable ? () => {
-                    setDragEnterCounter(prevState => prevState++);
-                  } : () => {
-                  }}
-                  onDragOver={props.isDroppable ? (e: { nativeEvent: { target?: any; layerX?: any; layerY?: any; }; preventDefault: () => void; stopPropagation: () => void; }) => {
-                    // we should ignore events from layout's children in Firefox
-                    // to avoid unpredictable jumping of a dropping placeholder
-                    // FIXME remove this hack
-                    if (
-                            isFirefox &&
-                            // $FlowIgnore can't figure this out
-                            !e.nativeEvent.target?.classList.contains(layoutClassName)
-                    ) {
-                      // without this Firefox will not allow drop if currently over droppingItem
-                      e.preventDefault();
-                      return false;
-                    }
 
-                    const {layout} = state;
-                    // This is relative to the DOM element that this event fired for.
-                    const {layerX, layerY} = e.nativeEvent;
-                    const droppingPosition = {left: layerX, top: layerY, e};
+                      props.onDrop(state.layout, item, e);
+                    } : () => {
+                    }}
+                    onDragLeave={props.isDroppable ? () => {
+                      setDragEnterCounter(prevState => prevState--)
 
-                    // @ts-ignore
-                    const {droppingPosition: droppingPosition1, droppingDOMNode} = state;
-                    if (!droppingDOMNode) {
-                      const positionParams: PositionParams = {
-                        cols: props.cols,
-                        margin: props.margin,
-                        maxRows: props.maxRows,
-                        rowHeight: props.rowHeight,
-                        // @ts-ignore
-                        containerWidth: props.width,
-                        containerHeight: props.height,
-                        containerPadding: props.margin
-                      };
+                      // onDragLeave can be triggered on each layout's child.
+                      // But we know that count of dragEnter and dragLeave events
+                      // will be balanced after leaving the layout's container
+                      // so we can increase and decrease count of dragEnter and
+                      // when it'll be equal to 0 we'll remove the placeholder
+                      if (dragEnterCounter === 0) {
+                        const newLayout = compact(
+                                state.layout.filter(l => l.i !== props.droppingItem.i),
+                                compactType(props),
+                                props.cols
+                        );
 
-                      const calculatedPosition = calcXY(
-                              positionParams,
-                              layerY,
-                              layerX,
-                              props.droppingItem.w,
-                              props.droppingItem.h
-                      );
-
-                      // @ts-ignore
-                      setState(prevState => ({
-                        ...prevState,
-                        droppingDOMNode: <div key={props.droppingItem.i}/>,
-                        droppingPosition,
-                        layout: [
-                          ...layout,
-                          {
-                            ...props.droppingItem,
-                            x: calculatedPosition.x,
-                            y: calculatedPosition.y,
-                            static: false,
-                            isDraggable: true
-                          }
-                        ]
-                      }));
-                    } else if (droppingPosition1) {
-                      const {left, top} = droppingPosition1;
-                      const shouldUpdatePosition = left != layerX || top != layerY;
-                      if (shouldUpdatePosition) {
                         setState(prevState => ({
                           ...prevState,
-                          droppingPosition
+                          layout: newLayout,
+                          droppingDOMNode: null,
+                          activeDrag: null,
+                          droppingPosition: undefined
                         }));
                       }
-                    }
+                    } : () => {
+                    }}
+                    onDragEnter={props.isDroppable ? () => {
+                      setDragEnterCounter(prevState => prevState++);
+                    } : () => {
+                    }}
+                    onDragOver={props.isDroppable ? (e: { nativeEvent: { target?: any; layerX?: any; layerY?: any; }; preventDefault: () => void; stopPropagation: () => void; }) => {
+                      // we should ignore events from layout's children in Firefox
+                      // to avoid unpredictable jumping of a dropping placeholder
+                      // FIXME remove this hack
+                      if (
+                              isFirefox &&
+                              // $FlowIgnore can't figure this out
+                              !e.nativeEvent.target?.classList.contains(layoutClassName)
+                      ) {
+                        // without this Firefox will not allow drop if currently over droppingItem
+                        e.preventDefault();
+                        return false;
+                      }
 
-                    e.stopPropagation();
-                    e.preventDefault();
-                  } : () => {
-                  }}
-          >
-            {React.Children.map(props.children, child => {
-                      const gridItem = getGridItemByValue(state, child.key)
-                      return (child && child.key && gridItem) && (
-                              <GridItem
-                                      layout={props.layout}
-                                      containerWidth={props.width}
-                                      containerHeight={props.height}
-                                      cols={props.cols}
-                                      margin={props.margin}
-                                      containerPadding={props.containerPadding}
-                                      maxRows={props.maxRows}
-                                      rowHeight={props.rowHeight}
-                                      cancel={props.draggableCancel}
-                                      handle={props.draggableHandle}
-                                      onDragStop={getOnDragStop(state, props, setState, onLayoutMaybeChanged)}
-                                      onDragStart={getOnDragStart(state, setState, props)}
-                                      onDrag={getOnDrag(state, props, setState)}
-                                      onResizeStart={getOnResizeStart(state, setState, props)}
-                                      onResize={getOnResize(state, props, setState)}
-                                      onResizeStop={getOnResizeStop(state, props, setState, onLayoutMaybeChanged)}
-                                      isDraggable={typeof gridItem?.isDraggable === "boolean"
-                                              ? gridItem?.isDraggable
-                                              : !gridItem?.static && props.isDraggable}
-                                      isResizable={typeof gridItem?.isResizable === "boolean"
-                                              ? gridItem?.isResizable
-                                              : !gridItem?.static && props.isResizable}
-                                      isBounded={(typeof gridItem?.isDraggable === "boolean"
-                                              ? gridItem?.isDraggable
-                                              : !gridItem?.static && props.isDraggable) && props.isBounded && gridItem?.isBounded !== false}
-                                      useCSSTransforms={props.useCSSTransforms && state.mounted}
-                                      usePercentages={!state.mounted}
-                                      transformScale={props.transformScale}
-                                      w={gridItem?.w}
-                                      h={gridItem?.h}
-                                      x={gridItem?.x}
-                                      y={gridItem?.y}
-                                      i={gridItem?.i}
-                                      minH={gridItem?.minH}
-                                      minW={gridItem?.minW}
-                                      maxH={gridItem?.maxH}
-                                      maxW={gridItem?.maxW}
-                                      static={gridItem?.static}
-                                      resizeHandles={gridItem?.resizeHandles || props.resizeHandles}
-                                      resizeHandle={props.resizeHandle}
-                              >
-                                {child}
-                              </GridItem>
-                      );
-                    }
-            )}
-            {props.isDroppable &&
-            state.droppingDOMNode?.key &&
-            gridItem && (
-                    <GridItem
-                            layout={props.layout}
-                            containerWidth={props.width}
-                            containerHeight={props.height}
-                            cols={props.cols}
-                            margin={props.margin}
-                            containerPadding={props.containerPadding}
-                            maxRows={props.maxRows}
-                            rowHeight={props.rowHeight}
-                            cancel={props.draggableCancel}
-                            handle={props.draggableHandle}
-                            onDragStop={getOnDragStop(state, props, setState, onLayoutMaybeChanged)}
-                            onDragStart={getOnDragStart(state, setState, props)}
-                            onDrag={getOnDrag(state, props, setState)}
-                            onResizeStart={getOnResizeStart(state, setState, props)}
-                            onResize={getOnResize(state, props, setState)}
-                            onResizeStop={getOnResizeStop(state, props, setState, onLayoutMaybeChanged)}
-                            isDraggable={isDraggable}
-                            isResizable={isResizable}
-                            isBounded={isBounded}
-                            useCSSTransforms={props.useCSSTransforms && state.mounted}
-                            usePercentages={!state.mounted}
-                            transformScale={props.transformScale}
-                            w={w}
-                            h={h}
-                            x={x}
-                            y={y}
-                            i={i}
-                            minH={minH}
-                            minW={minW}
-                            maxH={maxH}
-                            maxW={maxW}
-                            static={isStatic}
-                            droppingPosition={state.droppingPosition}
-                            resizeHandles={resizeHandles}
-                            resizeHandle={props.resizeHandle}
-                    >
-                      {state.droppingDOMNode}
-                    </GridItem>
-            )}
-            {state.activeDrag && (
-                    <GridItem
-                            w={state.activeDrag?.w}
-                            h={state.activeDrag?.h}
-                            x={state.activeDrag?.x}
-                            y={state.activeDrag?.y}
-                            i={state.activeDrag?.i}
-                            className="react-grid-placeholder"
-                            containerWidth={props.width}
-                            containerHeight={props.height}
-                            cols={props.cols}
-                            margin={props.margin}
-                            containerPadding={props.containerPadding}
-                            maxRows={props.maxRows}
-                            rowHeight={props.rowHeight}
-                            isDraggable={false}
-                            isResizable={false}
-                            isBounded={false}
-                            useCSSTransforms={props.useCSSTransforms}
-                            transformScale={props.transformScale}
-                    >
-                      <div/>
-                    </GridItem>
-            )}
+                      const {layout} = state;
+                      // This is relative to the DOM element that this event fired for.
+                      const {layerX, layerY} = e.nativeEvent;
+                      const droppingPosition = {left: layerX, top: layerY, e};
+
+                      // @ts-ignore
+                      const {droppingPosition: droppingPosition1, droppingDOMNode} = state;
+                      if (!droppingDOMNode) {
+                        const positionParams: PositionParams = {
+                          cols: props.cols,
+                          margin: props.margin,
+                          maxRows: props.maxRows,
+                          rowHeight: props.rowHeight,
+                          // @ts-ignore
+                          containerWidth: width,
+                          containerHeight: props.height,
+                          containerPadding: props.margin
+                        };
+
+                        const calculatedPosition = calcXY(
+                                positionParams,
+                                layerY,
+                                layerX,
+                                props.droppingItem.w,
+                                props.droppingItem.h
+                        );
+
+                        // @ts-ignore
+                        setState(prevState => ({
+                          ...prevState,
+                          droppingDOMNode: <div key={props.droppingItem.i}/>,
+                          droppingPosition,
+                          layout: [
+                            ...layout,
+                            {
+                              ...props.droppingItem,
+                              x: calculatedPosition.x,
+                              y: calculatedPosition.y,
+                              static: false,
+                              isDraggable: true
+                            }
+                          ]
+                        }));
+                      } else if (droppingPosition1) {
+                        const {left, top} = droppingPosition1;
+                        const shouldUpdatePosition = left != layerX || top != layerY;
+                        if (shouldUpdatePosition) {
+                          setState(prevState => ({
+                            ...prevState,
+                            droppingPosition
+                          }));
+                        }
+                      }
+
+                      e.stopPropagation();
+                      e.preventDefault();
+                    } : () => {
+                    }}
+            >
+              {React.Children.map(props.children, child => {
+                        const gridItem = getGridItemByValue(state, child.key)
+                        return (child && child.key && gridItem) && (
+                                <GridItem
+                                        layout={props.layout}
+                                        containerWidth={width}
+                                        containerHeight={props.height}
+                                        cols={props.cols}
+                                        margin={props.margin}
+                                        containerPadding={props.containerPadding}
+                                        maxRows={props.maxRows}
+                                        rowHeight={props.rowHeight}
+                                        cancel={props.draggableCancel}
+                                        handle={props.draggableHandle}
+                                        onDragStop={getOnDragStop(state, props, setState, onLayoutMaybeChanged)}
+                                        onDragStart={getOnDragStart(state, setState, props)}
+                                        onDrag={getOnDrag(state, props, setState)}
+                                        onResizeStart={getOnResizeStart(state, setState, props)}
+                                        onResize={getOnResize(state, props, setState)}
+                                        onResizeStop={getOnResizeStop(state, props, setState, onLayoutMaybeChanged)}
+                                        isDraggable={typeof gridItem?.isDraggable === "boolean"
+                                                ? gridItem?.isDraggable
+                                                : !gridItem?.static && props.isDraggable}
+                                        isResizable={typeof gridItem?.isResizable === "boolean"
+                                                ? gridItem?.isResizable
+                                                : !gridItem?.static && props.isResizable}
+                                        isBounded={(typeof gridItem?.isDraggable === "boolean"
+                                                ? gridItem?.isDraggable
+                                                : !gridItem?.static && props.isDraggable) && props.isBounded && gridItem?.isBounded !== false}
+                                        useCSSTransforms={props.useCSSTransforms && state.mounted}
+                                        usePercentages={!state.mounted}
+                                        transformScale={props.transformScale}
+                                        w={gridItem?.w}
+                                        h={gridItem?.h}
+                                        x={gridItem?.x}
+                                        y={gridItem?.y}
+                                        i={gridItem?.i}
+                                        minH={gridItem?.minH}
+                                        minW={gridItem?.minW}
+                                        maxH={gridItem?.maxH}
+                                        maxW={gridItem?.maxW}
+                                        static={gridItem?.static}
+                                        resizeHandles={gridItem?.resizeHandles || props.resizeHandles}
+                                        resizeHandle={props.resizeHandle}
+                                >
+                                  {child}
+                                </GridItem>
+                        );
+                      }
+              )}
+              {props.isDroppable &&
+              state.droppingDOMNode?.key &&
+              gridItem && (
+                      <GridItem
+                              layout={props.layout}
+                              containerWidth={width}
+                              containerHeight={props.height}
+                              cols={props.cols}
+                              margin={props.margin}
+                              containerPadding={props.containerPadding}
+                              maxRows={props.maxRows}
+                              rowHeight={props.rowHeight}
+                              cancel={props.draggableCancel}
+                              handle={props.draggableHandle}
+                              onDragStop={getOnDragStop(state, props, setState, onLayoutMaybeChanged)}
+                              onDragStart={getOnDragStart(state, setState, props)}
+                              onDrag={getOnDrag(state, props, setState)}
+                              onResizeStart={getOnResizeStart(state, setState, props)}
+                              onResize={getOnResize(state, props, setState)}
+                              onResizeStop={getOnResizeStop(state, props, setState, onLayoutMaybeChanged)}
+                              isDraggable={isDraggable}
+                              isResizable={isResizable}
+                              isBounded={isBounded}
+                              useCSSTransforms={props.useCSSTransforms && state.mounted}
+                              usePercentages={!state.mounted}
+                              transformScale={props.transformScale}
+                              w={w}
+                              h={h}
+                              x={x}
+                              y={y}
+                              i={i}
+                              minH={minH}
+                              minW={minW}
+                              maxH={maxH}
+                              maxW={maxW}
+                              static={isStatic}
+                              droppingPosition={state.droppingPosition}
+                              resizeHandles={resizeHandles}
+                              resizeHandle={props.resizeHandle}
+                      >
+                        {state.droppingDOMNode}
+                      </GridItem>
+              )}
+              {state.activeDrag && (
+                      <GridItem
+                              w={state.activeDrag?.w}
+                              h={state.activeDrag?.h}
+                              x={state.activeDrag?.x}
+                              y={state.activeDrag?.y}
+                              i={state.activeDrag?.i}
+                              className="react-grid-placeholder"
+                              containerWidth={width}
+                              containerHeight={props.height}
+                              cols={props.cols}
+                              margin={props.margin}
+                              containerPadding={props.containerPadding}
+                              maxRows={props.maxRows}
+                              rowHeight={props.rowHeight}
+                              isDraggable={false}
+                              isResizable={false}
+                              isBounded={false}
+                              useCSSTransforms={props.useCSSTransforms}
+                              transformScale={props.transformScale}
+                      >
+                        <div/>
+                      </GridItem>
+              )}
+            </div>
           </div>
   );
 }

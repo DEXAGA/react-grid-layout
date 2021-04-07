@@ -2,7 +2,7 @@ import React from "react";
 import _ from "lodash";
 import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout = RGL;
 
 const availableHandles = ["s", "w", "e", "n", "sw", "nw", "se", "ne"];
 const ResizableHandles = (props) => {

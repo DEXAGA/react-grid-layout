@@ -29,9 +29,12 @@ function getIndentationValue(
 
 const ResponsiveReactGridLayout = (props) => {
 
+  const parentRef = React.useRef();
+  const [{width, height}] = useSize(parentRef)
+
   const generateInitialState = () => {
     let compactType = props.compactType;
-    const breakpoint = getBreakpointFromWidth(props.breakpoints, props.width);
+    const breakpoint = getBreakpointFromWidth(props.breakpoints, width);
     // verticalCompact compatibility, now deprecated
     compactType = props.verticalCompact === false ? null : compactType;
     // Get the initial layout. This can tricky; we try to generate one however possible if one doesn't exist
@@ -54,8 +57,6 @@ const ResponsiveReactGridLayout = (props) => {
     ...generateInitialState()
   })
 
-  const parentRef = React.useRef();
-  const {width, height} = useSize(parentRef)
 
   React.useEffect(() => {
     return setState(prevState => {
@@ -84,7 +85,7 @@ const ResponsiveReactGridLayout = (props) => {
 
   React.useEffect(() => {
     if (
-            props.width != props.width ||
+            width != width ||
             props.breakpoint !== props.breakpoint ||
             !isEqual(props.breakpoints, props.breakpoints) ||
             !isEqual(props.cols, props.cols)
@@ -107,7 +108,7 @@ const ResponsiveReactGridLayout = (props) => {
    */
   const onWidthChange = (prevProps: Readonly<any>) => {
     const newBreakpoint =
-            props.breakpoint || getBreakpointFromWidth(props.breakpoints, props.width);
+            props.breakpoint || getBreakpointFromWidth(props.breakpoints, width);
 
     const lastBreakpoint = state.breakpoint;
     const newCols: number = (props.cols)[newBreakpoint];
@@ -164,7 +165,7 @@ const ResponsiveReactGridLayout = (props) => {
 
     //call onWidthChange on every change of width, not only on breakpoint changes
     props.onWidthChange(
-            props.width,
+            width,
             margin,
             newCols,
             containerPadding
@@ -174,13 +175,15 @@ const ResponsiveReactGridLayout = (props) => {
   return (
           <div ref={parentRef}
                style={{
-                 height: `100%`
+                 height: `100%`,
+                 width: `100%`
                }}>
             <ReactGridLayout
                     autoSize={props.autoSize}
                     children={props.children}
                     compactType={props.compactType}
-                    innerRef={props.innerRef}
+                    // innerRef={props.innerRef}
+                    innerRef={parentRef}
                     onDrop={props.onDrop}
                     preventCollision={props.preventCollision}
                     width={width}

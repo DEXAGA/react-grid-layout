@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import classNames from "classnames";
 import React from "react";
@@ -84,58 +83,12 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
 
 
   /**
-   * Wrapper around drag events to provide more useful data.
-   * All drag events call the function with the given handler name,
-   * with the signature (index, x, y).
-   *
-   * @param  {String} handlerName Handler name to wrap.
-   * @return {Function}           Handler function.
-   */
-  const onResizeHandler = (
-          e: Event,
-          {node, size}:any ,
-          handlerName: string
-  ) => {
-    const handler = props[handlerName];
-    if (!handler) return;
-    const {cols, x, y, i, maxH, minH} = props;
-    let {minW, maxW} = props;
-
-    // Get new XY
-    let {w, h} = calcWH(
-            getPositionParams(),
-            size.width,
-            size.height,
-            x,
-            y
-    );
-
-    // minW should be at least 1 (TODO propTypes validation?)
-    minW = Math.max(minW, 1);
-
-    // maxW should be at most (cols - x)
-    maxW = Math.min(maxW, cols - x);
-
-    // Min/max capping
-    w = clamp(w, minW, maxW);
-    h = clamp(h, minH, maxH);
-
-    setState(prevState => ({
-      ...prevState,
-      resizing: handlerName === "onResizeStop" ? null : size,
-    }));
-
-    handler.call(this, i, w, h, {e, node, size});
-  }
-
-  /**
    * onDragStart event handler
    * @param  {Event}  e             event data
    * @param  {Object} callbackData  an object with node, delta and position information
    */
   const onDragStart = (e:Event, {node}:any) => {
-    const {onDragStart, transformScale} = props;
-    if (!onDragStart) return;
+    if (!props.onDragStart) return;
 
     const newPosition  = {top: 0, left: 0};
 
@@ -144,10 +97,10 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
     if (!offsetParent) return;
     const parentRect = offsetParent.getBoundingClientRect();
     const clientRect = node.getBoundingClientRect();
-    const cLeft = clientRect.left / transformScale;
-    const pLeft = parentRect.left / transformScale;
-    const cTop = clientRect.top / transformScale;
-    const pTop = parentRect.top / transformScale;
+    const cLeft = clientRect.left / props.transformScale;
+    const pLeft = parentRect.left / props.transformScale;
+    const cTop = clientRect.top / props.transformScale;
+    const pTop = parentRect.top / props.transformScale;
     newPosition.left = cLeft - pLeft + offsetParent.scrollLeft;
     newPosition.top = cTop - pTop + offsetParent.scrollTop;
     // @ts-ignore
@@ -165,7 +118,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
             props.h
     );
 
-    return onDragStart.call(this, props.i, x, y, {
+    return props.onDragStart.call(this, props.i, x, y, {
       e,
       node,
       newPosition
@@ -181,8 +134,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
           e:Event,
           {node, deltaX, deltaY}: {node: any, deltaX: any, deltaY: any}
   ) => {
-    const {onDrag} = props;
-    if (!onDrag) return;
+    if (!props.onDrag) return;
 
     if (!state.dragging) {
       throw new Error("onDrag called before onDragStart.");
@@ -192,23 +144,20 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
     // @ts-ignore
     let left = state?.dragging?.left + deltaX;
 
-    const {isBounded, i, w, h, containerWidth, containerHeight} = props;
     const positionParams = getPositionParams();
 
     // Boundary calculations; keeps items within the grid
-    if (isBounded) {
-      const {offsetParent} = node;
+    if (props.isBounded) {
 
-      if (offsetParent) {
-        const {margin} = props;
+      if (node.offsetParent) {
         const rowHeight = calcGridRowHeight(positionParams);
         const bottomBoundary =
-                containerHeight - calcGridItemWHPx(h, rowHeight, margin[1]);
+                props.containerHeight - calcGridItemWHPx(props.h, rowHeight, (props.margin)[1]);
         top = clamp(top, 0, bottomBoundary);
 
         const colWidth = calcGridColWidth(positionParams);
         const rightBoundary =
-                containerWidth - calcGridItemWHPx(w, colWidth, margin[0]);
+                props.containerWidth - calcGridItemWHPx(props.w, colWidth, (props.margin)[0]);
         left = clamp(left, 0, rightBoundary);
       }
     }
@@ -221,8 +170,8 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
     }));
 
     // Call callback with this data
-    const {x, y} = calcXY(positionParams, top, left, w, h);
-    return onDrag.call(this, i, x, y, {
+    const {x, y} = calcXY(positionParams, top, left, props.w, props.h);
+    return props.onDrag.call(this, props.i, x, y, {
       e,
       node,
       newPosition
@@ -235,30 +184,229 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
    * @param  {Object} callbackData  an object with node, delta and position information
    */
   const onDragStop = (e:Event, {node}:any) => {
-    const {onDragStop} = props;
-    if (!onDragStop) return;
+    if (!props.onDragStop) return;
 
     if (!state.dragging) {
       throw new Error("onDragEnd called before onDragStart.");
     }
-    const {w, h, i} = props;
 
-    const {left, top}: any = state.dragging;
-    const newPosition  = {top, left};
+    const newPosition  = {top: state.dragging.top, left: state.dragging.left};
     setState(prevState => ({
       ...prevState,
       dragging: null,
     }));
 
-    const {x, y} = calcXY(getPositionParams(), top, left, w, h);
+    const {x, y} = calcXY(getPositionParams(), state.dragging.top, state.dragging.left, props.w, props.h);
 
-    return onDragStop.call(this, i, x, y, {
+    return props.onDragStop.call(this, props.i, x, y, {
       e,
       node,
       newPosition
     });
   };
 
+  let onResizeStart = (
+          e: Event,
+          callbackData: any
+  ) => {
+    const newPosition  = {top: 0, left: 0};
+
+    // TODO: this wont work on nested parents
+    if (!callbackData.node.offsetParent) return;
+    const parentRect = callbackData.node.offsetParent.getBoundingClientRect();
+    const clientRect = callbackData.node.getBoundingClientRect();
+    const cLeft = clientRect.left / props.transformScale;
+    const pLeft = parentRect.left / props.transformScale;
+    const cTop = clientRect.top / props.transformScale;
+    const pTop = parentRect.top / props.transformScale;
+    newPosition.left = cLeft - pLeft + callbackData.node.offsetParent.scrollLeft;
+    newPosition.top = cTop - pTop + callbackData.node.offsetParent.scrollTop;
+    newPosition.width = clientRect.width / props.transformScale
+    newPosition.height = clientRect.height / props.transformScale
+
+
+    if (!props.onResizeStart) return
+
+    const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
+
+    // Get new XY
+    let {w, h} = calcWH(
+            getPositionParams(),
+            callbackData.size.width,
+            callbackData.size.height,
+            props.x,
+            props.y,
+            handleOrientation
+    );
+
+    // Min/max capping
+    w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
+    h = clamp(h, props.minH, props.maxH);
+
+    setState(prevState => ({
+      ...prevState,
+      resizing: newPosition,
+      resizeStartPos: newPosition
+    }));
+
+    props.onResizeStart.call(this, props.i, w, h, {e, node: callbackData.node, size: newPosition, handle: props.handle});
+  };
+
+  let onResize = (
+          e: Event,
+          callbackData: any
+  ) => {
+    if (!props.onResize) return
+
+    const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
+
+    // Get new XY
+    let {w, h} = calcWH(
+            getPositionParams(),
+            callbackData.size.width,
+            callbackData.size.height,
+            props.x,
+            props.y,
+            handleOrientation
+    );
+
+    // Min/max capping
+    w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
+    h = clamp(h, props.minH, props.maxH);
+
+    let elem = callbackData.node.parentNode;
+    if (elem) {
+      let currentLeft, currentTop;
+      if (props.useCSSTransforms) {
+        const transformCSS = elem.style.transform
+                .replace(/[^\d.,]/g, "")
+                .split(",")
+        currentLeft = parseInt(transformCSS[0], 10);
+        currentTop = parseInt(transformCSS[1], 10);
+      } else {
+        currentLeft = parseInt(elem.style.left, 10);
+        currentTop = parseInt(elem.style.top, 10);
+      }
+
+      const currentWidth = elem.offsetWidth;
+      const currentHeight = elem.offsetHeight;
+
+      if (
+              [
+                "sw",
+                "w",
+                "nw",
+                "n",
+                "ne"
+              ].indexOf(callbackData.handle) === -1
+      ) {
+        setState(prevState => ({
+          ...prevState,
+          resizing: callbackData.size
+        }));
+      } else {
+        if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop;
+        } else if (
+                ["n", "ne"].indexOf(callbackData.handle) !== -1
+        ) {
+          callbackData.size.left = currentLeft;
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        } else {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        }
+        callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
+        callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
+      }
+      console.log(state, props, callbackData.size)
+      setState(prevState => ({
+        ...prevState,
+        resizing: callbackData.size
+      }));
+    }
+
+    props.onResize.call(this, props.i, w, h, {e, node: elem, size: callbackData.size, handle: callbackData.handle});
+  };
+
+  let onResizeStop = (
+          e: Event,
+          callbackData: any
+  ) => {
+    if (!props.onResizeStop) return
+
+    const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
+
+    // Get new XY
+    let {w, h} = calcWH(
+            getPositionParams(),
+            callbackData.size.width,
+            callbackData.size.height,
+            props.x,
+            props.y,
+            handleOrientation
+    );
+
+    // Min/max capping
+    w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
+    h = clamp(h, props.minH, props.maxH);
+
+    if (callbackData.node) {
+      let currentLeft, currentTop;
+      if (props.useCSSTransforms) {
+        const transformCSS = callbackData.node.style.transform
+                .replace(/[^\d.,]/g, "")
+                .split(",")
+        currentLeft = parseInt(transformCSS[0], 10);
+        currentTop = parseInt(transformCSS[1], 10);
+      } else {
+        currentLeft = parseInt(callbackData.node.style.left, 10);
+        currentTop = parseInt(callbackData.node.style.top, 10);
+      }
+
+      const currentWidth = callbackData.node.offsetWidth;
+      const currentHeight = callbackData.node.offsetHeight;
+
+      if (
+              [
+                "sw",
+                "w",
+                "nw",
+                // "n",
+                "ne"
+              ].indexOf(callbackData.handle) === -1
+      ) {
+        setState(prevState => ({
+          ...prevState,
+          resizing: null,
+          resizeStartPos: null,
+        }));
+      } else {
+        if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop;
+        } else if (
+                ["n", "ne"].indexOf(callbackData.handle) !== -1
+        ) {
+          callbackData.size.left = currentLeft;
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        } else {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        }
+        callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
+        callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
+      }
+      setState(prevState => ({
+        ...prevState,
+        resizing: null,
+        resizeStartPos: null,
+      }));
+    }
+
+    props.onResizeStop.call(this, props.i, w, h, {e, node: callbackData.node, size: callbackData.size, handle: callbackData.handle});
+  };
 
   // When a droppingPosition is present, this means we should fire a move event, as if we had moved
   // this element by `x, y` pixels.
@@ -341,7 +489,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
   const positionParams = getPositionParams();
 
   // This is the max possible width - doesn't go to infinity because of the width of the window
-  const maxWidth = calcGridItemPosition(positionParams, 0, 0, props.cols - props.x, 0, {
+  const maxWidth = calcGridItemPosition(positionParams, 0, 0, props.cols, 0, {
     dragging: undefined,
     resizing: undefined
   })
@@ -371,8 +519,6 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
           state
   );
 
-  // console.log(props, newPosition)
-  // console.log(props.i, newPosition)
   return (
   // @ts-ignore
           <DraggableCore
@@ -399,24 +545,9 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
                     height={newPosition.height}
                     minConstraints={minConstraints}
                     maxConstraints={maxConstraints}
-                    onResizeStop={(
-                            e: Event,
-                            callbackData: any
-                    ) => {
-                      onResizeHandler(e, callbackData, "onResizeStop");
-                    }}
-                    onResizeStart={(
-                            e: Event,
-                            callbackData: any
-                    ) => {
-                      onResizeHandler(e, callbackData, "onResizeStart");
-                    }}
-                    onResize={(
-                            e: Event,
-                            callbackData: any
-                    ) => {
-                      onResizeHandler(e, callbackData, "onResize");
-                    }}
+                    onResizeStop={onResizeStop}
+                    onResizeStart={onResizeStart}
+                    onResize={onResize}
                     transformScale={props.transformScale}
                     resizeHandles={props.resizeHandles}
                     handle={props.resizeHandle}

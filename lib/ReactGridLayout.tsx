@@ -146,7 +146,7 @@ function getOnDrag(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; c
 }
 
 function getOnResizeStart(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }) {
-  return (i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
+  return (i: string, w: number, h: number, {e, node, handle}: GridResizeEvent) => {
     const l = state.layout.find(((value, index) => (state.layout)[index].i === i));
     if (!l) return;
 
@@ -156,7 +156,8 @@ function getOnResizeStart(state: { layout: Readonly<LayoutItem>[]; oldDragItem: 
       oldResizeItem: {
         ...(l)
       },
-      oldLayout: state.layout
+      oldLayout: state.layout,
+      resizing: true
     }));
 
     props.onResizeStart(state.layout, l, l, null, e, node);
@@ -164,7 +165,7 @@ function getOnResizeStart(state: { layout: Readonly<LayoutItem>[]; oldDragItem: 
 }
 
 function getOnResize(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void) {
-  return (i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
+  return (i: string, w: number, h: number, {e, node, size, handle}: GridResizeEvent) => {
 
     const [newLayout, l] = withLayoutItem(state.layout, i, (l: { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }) => {
       // Something like quad tree should be used
@@ -191,14 +192,48 @@ function getOnResize(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null;
         }
       }
 
-      if (!hasCollisions) {
-        // Set new width and height.
-        l.w = w;
-        l.h = h;
-      }
+      // if (!hasCollisions) {
+      //   // Set new width and height.
+      //   l.w = w;
+      //   l.h = h;
+      // }
 
       return l;
     });
+
+    let finalLayout;
+    if (["sw", "w", "nw", "n", "ne"].indexOf(handle) !== -1) {
+      let x = l.x;
+      let y = l.y;
+      if (["sw", "nw", "w"].indexOf(handle) !== -1) {
+        x = l.x + (l.w - w);
+        x = x < 0 ? 0 : x;
+      }
+
+      if (["ne", "n", "nw"].indexOf(handle) !== -1) {
+        y = l.y + (l.h - h);
+        y = y < 0 ? 0 : y;
+      }
+
+      l.w = w;
+      l.h = h;
+      // Move the element to the new position.
+      const isUserAction = true;
+      finalLayout = moveElement(
+              newLayout,
+              l,
+              x,
+              y,
+              isUserAction,
+              props.preventCollision,
+              compactType(props),
+              props.cols
+      );
+    } else {
+      l.w = w;
+      l.h = h;
+      finalLayout = newLayout
+    }
 
     // Shouldn't ever happen, but typechecking makes it necessary
     if (!l) return;
@@ -218,21 +253,21 @@ function getOnResize(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null;
       "i": i
     };
 
-    props.onResize(newLayout, state.oldResizeItem, l, placeholder, e, node);
+    props.onResize(finalLayout, state.oldResizeItem, l, placeholder, e, node);
 
     // Re-compact the newLayout and set the drag placeholder.
     // @ts-ignore
     // @ts-ignore
     setState(prevState => ({
       ...prevState,
-      layout: compact(newLayout, compactType(props), props.cols),
+      layout: compact(finalLayout, compactType(props), props.cols),
       activeDrag: placeholder
     }));
   };
 }
 
 function getOnResizeStop(state: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }, props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any }, setState: (value: (((prevState: { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) => { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean }) | { layout: Readonly<LayoutItem>[]; oldDragItem: null; children: any[]; activeDrag: null; oldResizeItem: null; oldLayout: null; droppingDOMNode: null; mounted: boolean })) => void, onLayoutMaybeChanged: (newLayout: Layout, oldLayout: (Layout | null)) => void) {
-  return (i: string, w: number, h: number, {e, node}: GridResizeEvent) => {
+  return (i: string, w: number, h: number, {e, node, handle}: GridResizeEvent) => {
     const {layout, oldResizeItem} = state;
     const {cols} = props;
     const l = layout.find(((value, index) => layout[index].i === i));
@@ -247,7 +282,8 @@ function getOnResizeStop(state: { layout: Readonly<LayoutItem>[]; oldDragItem: n
       activeDrag: null,
       layout: newLayout,
       oldResizeItem: null,
-      oldLayout: null
+      oldLayout: null,
+      resizing: false
     }));
 
     onLayoutMaybeChanged(newLayout, oldLayout);
@@ -578,6 +614,7 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                                         static={gridItem?.static}
                                         resizeHandles={gridItem?.resizeHandles || props.resizeHandles}
                                         resizeHandle={props.resizeHandle}
+                                        activeDrag={state.activeDrag ?? null}
                                 >
                                   {child}
                                 </GridItem>
@@ -634,7 +671,9 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                               x={state.activeDrag?.x}
                               y={state.activeDrag?.y}
                               i={state.activeDrag?.i}
-                              className="react-grid-placeholder"
+                              className={classNames("react-grid-placeholder", {
+                                "placeholder-resizing": Boolean(state.resizing)
+                              })}
                               containerWidth={width}
                               containerHeight={props.height}
                               cols={props.cols}

@@ -85,6 +85,14 @@ export function calcGridItemPosition(
   if (state && state.dragging) {
     out.top = Math.round(state.dragging.top);
     out.left = Math.round(state.dragging.left);
+  } else if (
+          state &&
+          state.resizing &&
+          typeof state.resizing.top === "number" &&
+          typeof state.resizing.left === "number"
+  ) {
+    out.top = Math.round(state.resizing.top);
+    out.left = Math.round(state.resizing.left);
   }
   // Otherwise, calculate from grid units.
   else {
@@ -145,7 +153,8 @@ export function calcWH(
   width: number,
   height: number,
   x: number,
-  y: number
+  y: number,
+  handleOrientation: string
 ): { w: number, h: number } {
   const {margin, maxRows, cols} = positionParams;
   const colWidth = calcGridColWidth(positionParams);
@@ -158,7 +167,12 @@ export function calcWH(
   let h = Math.round((height + margin[1]) / (rowHeight + margin[1]));
 
   // Capping
-  w = clamp(w, 0, cols - x);
+  if (handleOrientation === "west") {
+    w = clamp(w, 0, cols);
+  } else {
+    w = clamp(w, 0, cols - x);
+  }
+
   h = clamp(h, 0, maxRows - y);
   return { w, h };
 }

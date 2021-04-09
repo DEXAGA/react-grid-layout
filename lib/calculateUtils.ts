@@ -1,4 +1,3 @@
-
 import type {Position} from "./utils";
 
 export type PositionParams = {
@@ -9,42 +8,6 @@ export type PositionParams = {
   rowHeight: number,
   maxRows: number
 };
-
-// Helper for generating column width
-export function calcGridColWidth(positionParams: PositionParams): number {
-  const {
-    margin,
-    containerPadding,
-  // @ts-ignore
-    containerWidth,
-    cols}: PositionParams = positionParams;
-  return (
-          (containerWidth - margin[0] * (cols - 1) - containerPadding[0] * 2) / cols
-  );
-}
-
-export function calcGridRowHeight(positionParams: PositionParams): number {
-  const {margin, containerPadding, containerHeight, cols} = positionParams;
-  return (
-          (containerHeight - margin[1] * (cols - 1) - containerPadding[1] * 2) / cols
-  );
-}
-
-// This can either be called:
-// calcGridItemWHPx(w, colWidth, margin[0])
-// or
-// calcGridItemWHPx(h, rowHeight, margin[1])
-export function calcGridItemWHPx(
-        gridUnits: number,
-        colOrRowSize: number,
-        marginPx: number
-): number {
-  // 0 * Infinity === NaN, which causes problems with resize contraints
-  if (!Number.isFinite(gridUnits)) return gridUnits;
-  return Math.round(
-    colOrRowSize * gridUnits + Math.max(0, gridUnits - 1) * marginPx
-  );
-}
 
 /**
  * Return position on the page given an x, y, w, h.
@@ -64,9 +27,12 @@ export function calcGridItemPosition(
   h: number,
   state: { resizing: any; dragging: any; className?: string; }
 )  {
-  const {margin, containerPadding} = positionParams;
-  const colWidth = calcGridColWidth(positionParams);
-  const rowHeight = calcGridRowHeight(positionParams);
+  const colWidth = (
+          (positionParams.containerWidth - (positionParams.margin)[0] * (positionParams.cols - 1) - (positionParams.containerPadding)[0] * 2) / positionParams.cols
+  );
+  const rowHeight = (
+          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.cols - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.cols
+  );
   const out: Record<any,any> = {};
 
   // If resizing, use the exact width and height as returned from resizing callbacks.
@@ -77,8 +43,8 @@ export function calcGridItemPosition(
   }
   // Otherwise, calculate from grid units.
   else {
-    out.width = calcGridItemWHPx(w, colWidth, margin[0]);
-    out.height = calcGridItemWHPx(h, rowHeight, margin[1]);
+    out.width = !Number.isFinite(w) ? w : Math.round(colWidth * w + Math.max(0, w - 1) * (positionParams.margin)[0]);
+    out.height = !Number.isFinite(h) ? h : Math.round(rowHeight * h + Math.max(0, h - 1) * (positionParams.margin)[1]);
   }
 
   // If dragging, use the exact width and height as returned from dragging callbacks.
@@ -96,8 +62,8 @@ export function calcGridItemPosition(
   }
   // Otherwise, calculate from grid units.
   else {
-    out.top = Math.round((rowHeight + margin[1]) * y + containerPadding[1]);
-    out.left = Math.round((colWidth + margin[0]) * x + containerPadding[0]);
+    out.top = Math.round((rowHeight + (positionParams.margin)[1]) * y + (positionParams.containerPadding)[1]);
+    out.left = Math.round((colWidth + (positionParams.margin)[0]) * x + (positionParams.containerPadding)[0]);
   }
 
   return out;
@@ -120,8 +86,12 @@ export function calcXY(
   h: number
 ): { x: number, y: number } {
   const {margin, cols, maxRows} = positionParams;
-  const colWidth = calcGridColWidth(positionParams);
-  const rowHeight = calcGridRowHeight(positionParams);
+  const colWidth = (
+          (positionParams.containerWidth - (positionParams.margin)[0] * (positionParams.cols - 1) - (positionParams.containerPadding)[0] * 2) / positionParams.cols
+  );
+  const rowHeight = (
+          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.cols - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.cols
+  );
 
   // left = colWidth * x + margin * (x + 1)
   // l = cx + m(x+1)
@@ -156,24 +126,27 @@ export function calcWH(
   y: number,
   handleOrientation: string
 ): { w: number, h: number } {
-  const {margin, maxRows, cols} = positionParams;
-  const colWidth = calcGridColWidth(positionParams);
-  const rowHeight = calcGridRowHeight(positionParams);
+  const colWidth = (
+          (positionParams.containerWidth - (positionParams.margin)[0] * (positionParams.cols - 1) - (positionParams.containerPadding)[0] * 2) / positionParams.cols
+  );
+  const rowHeight = (
+          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.cols - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.cols
+  );
 
   // width = colWidth * w - (margin * (w - 1))
   // ...
   // w = (width + margin) / (colWidth + margin)
-  let w = Math.round((width + margin[0]) / (colWidth + margin[0]));
-  let h = Math.round((height + margin[1]) / (rowHeight + margin[1]));
+  let w = Math.round((width + (positionParams.margin)[0]) / (colWidth + (positionParams.margin)[0]));
+  let h = Math.round((height + (positionParams.margin)[1]) / (rowHeight + (positionParams.margin)[1]));
 
   // Capping
   if (handleOrientation === "west") {
-    w = clamp(w, 0, cols);
+    w = clamp(w, 0, positionParams.cols);
   } else {
-    w = clamp(w, 0, cols - x);
+    w = clamp(w, 0, positionParams.cols - x);
   }
 
-  h = clamp(h, 0, maxRows - y);
+  h = clamp(h, 0, positionParams.maxRows - y);
   return { w, h };
 }
 

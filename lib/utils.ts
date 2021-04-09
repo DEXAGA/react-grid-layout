@@ -77,80 +77,6 @@ export function bottom(layout: Layout): number {
   return max;
 }
 
-export function cloneLayout(layout: Layout): Layout {
-  const newLayout = Array(layout.length);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    newLayout[i] = {
-      ...(layout[i])
-    };
-  }
-  return newLayout;
-}
-
-// Modify a layoutItem inside a layout. Returns a new Layout,
-// does not mutate. Carries over all other LayoutItems unmodified.
-export function modifyLayout(layout: Layout, layoutItem: LayoutItem): Layout {
-  const newLayout = Array(layout.length);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    if (layoutItem.i === layout[i].i) {
-      newLayout[i] = layoutItem;
-    } else {
-      newLayout[i] = layout[i];
-    }
-  }
-  return newLayout;
-}
-
-// Function to be called to modify a layout item.
-// Does defensive clones to ensure the layout is not modified.
-export function withLayoutItem(
-  layout: Layout,
-  itemKey: string,
-  cb: { (l: { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }): { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }; (arg0: LayoutItem): Readonly<LayoutItem> | undefined; }
-) :any {
-  let item = layout.find(((value, index) => layout[index].i === itemKey));
-  if (!item) return [layout, null];
-  item = cb({
-    ...(item)
-  }); // defensive clone then modify
-  // FIXME could do this faster if we already knew the index
-  layout = modifyLayout(layout, item);
-  return [layout, item];
-}
-
-// Fast path to cloning, since this is monomorphic
-/**
- * Comparing React `children` is a bit difficult. This is a good way to compare them.
- * This will catch differences in keys, order, and length.
- */
-export function childrenEqual(a: any, b: any): boolean {
-  return isEqual(
-    React.Children.map(a, c => c.key),
-    React.Children.map(b, c => c.key)
-  );
-}
-
-/**
- * See `fastRGLPropsEqual.ts`.
- * We want this to run as fast as possible - it is called often - and to be
- * resilient to new props that we add. So rather than call lodash.isEqual,
- * which isn't suited to comparing props very well, we use this specialized
- * function in conjunction with preval to generate the fastest possible comparison
- * function, tuned for exactly our props.
- */
-type FastRGLPropsEqual = (obj:Object, obj2:Object, func:Function) => boolean;
-export const fastRGLPropsEqual: FastRGLPropsEqual = require("./fastRGLPropsEqual");
-
-// Like the above, but a lot simpler.
-export function fastPositionEqual(a: Position, b: Position): boolean {
-  return (
-    a.left === b.left &&
-    a.top === b.top &&
-    a.width === b.width &&
-    a.height === b.height
-  );
-}
-
 /**
  * Given two layoutitems, check if they collide.
  */
@@ -525,41 +451,6 @@ export function moveElementAwayFromCollision(
 }
 
 /**
- * Helper to convert a number to a percentage string.
- *
- * @param  {Number} num Any number
- * @return {String}     That number as a percentage.
- */
-export function perc(num: number): string {
-  return num * 100 + "%";
-}
-
-export function setTransform({ top, left, width, height }: Position) {
-  // Replace unitless items with px
-  const translate = `translate(${left}px,${top}px)`;
-  return {
-    transform: translate,
-    WebkitTransform: translate,
-    MozTransform: translate,
-    msTransform: translate,
-    OTransform: translate,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: "absolute"
-  };
-}
-
-export function setTopLeft({ top, left, width, height }: Position) {
-  return {
-    top: `${top}px`,
-    left: `${left}px`,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: "absolute"
-  };
-}
-
-/**
  * Get layout items sorted from top left to right and down.
  *
  * @return {Array} Array of layout objects.
@@ -718,23 +609,4 @@ export function validateLayout(
     }
   }
 }
-
-// Legacy support for verticalCompact: false
-export function compactType(
-  props: { layout?: any; children?: any; cols?: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any; }
-): CompactType {
-  const { verticalCompact, compactType }:any = props || {};
-  return verticalCompact === false ? null : compactType;
-}
-
-// // Flow can't really figure this out, so we just use Object
-// export function autoBindHandlers(el: Record<any,any>, fns: Array<string>): void {
-//   fns.forEach(key => (el[key] = el[key].bind(el)));
-// }
-
-// function log(...args: string[]) {
-//   if (!DEBUG) return;
-//   // eslint-disable-next-line no-console
-//   console.log(...args);
-// }
 

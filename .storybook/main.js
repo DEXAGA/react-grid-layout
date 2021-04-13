@@ -12,7 +12,7 @@ module.exports = {
 
     return config;
   },
-  "typescript": {
+  typescript: {
     check: false
   },
   "stories": [

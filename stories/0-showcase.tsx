@@ -1,6 +1,6 @@
 import _ from "lodash";
 import * as React from "react";
-import RGL from 'react-grid-layout-hooks/lib/ResponsiveReactGridLayout';
+import RGL from '../lib/ResponsiveReactGridLayout';
 import {WidthProvider} from "../index";
 
 const ResponsiveReactGridLayout = RGL;

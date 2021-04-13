@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React from "react";
-import {DraggableCore} from "react-draggable-hooks";
-import {Resizable} from "react-resizable-hooks";
+import DraggableCore from "./DraggableCore";
+import Resizable from "./Resizable";
 import {calcGridItemPosition, calcWH, calcXY, clamp} from "./calculateUtils";
 
 

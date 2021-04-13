@@ -1,7 +1,7 @@
 // @ts-ignore
 import isEqual from "lodash.isequal";
-import React from "react";
 
+import * as React from 'react';
 export type LayoutItem = {
   w: number,
   h: number,
@@ -60,6 +60,18 @@ export type CompactType =  ("horizontal" | "vertical");
 
 const isProduction = process.env.NODE_ENV === "production";
 const DEBUG = false;
+
+
+// React.addons.cloneWithProps look-alike that merges style & className.
+export function cloneElement(element: JSX.Element, props): JSX.Element {
+  if (props.style && element.props.style) {
+    props.style = {...element.props.style, ...props.style};
+  }
+  if (props.className && element.props.className) {
+    props.className = `${element.props.className} ${props.className}`;
+  }
+  return React.cloneElement(element, props);
+}
 
 /**
  * Return the bottom coordinate of the layout.

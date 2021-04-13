@@ -1,0 +1,178 @@
+* {
+    box-sizing: border-box;
+}
+html, body {
+    height: 100%;
+}
+
+body {
+    color: #222;
+    font-family: "Helvetica Neue", sans-serif;
+    font-weight: 200;
+    margin: 0 50px;
+}
+
+.react-draggable, .cursor {
+    cursor: move;
+}
+.no-cursor {
+    cursor: auto;
+}
+.cursor-y {
+    cursor: ns-resize;
+}
+.cursor-x {
+    cursor: ew-resize;
+}
+
+.react-draggable strong {
+    background: #ddd;
+    border: 1px solid #999;
+    border-radius: 3px;
+    display: block;
+    margin-bottom: 10px;
+    padding: 3px 5px;
+    text-align: center;
+}
+
+.box {
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 3px;
+    width: 180px;
+    height: 180px;
+    margin: 10px;
+    padding: 10px;
+    float: left;
+}
+.no-pointer-events {
+    pointer-events: none;
+}
+.hovered {
+    background-color: gray;
+}
+
+
+/*
+ * RemWrapper needs to take it's styles from this element,
+ * and this element can't have an absolute position after it's kicked in.
+ * AFAIK it's not possible to do this directly in the RemWrapper component.
+ */
+.rem-position-fix {
+    position: static !important;
+}
+.layoutRoot {
+    display: flex;
+    background: #eee;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.absoluteLayout {
+    height: 600px;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+.scaledLayout {
+    width: 125%;
+    left: -12.5%;
+    transform: scale(0.75);
+    margin-top: -7.5%;
+}
+
+.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: #ccc;
+    border: 1px solid black;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    overflow: hidden;
+    position: relative;
+    margin: 20px;
+}
+.box .text {
+    text-align: center;
+}
+
+.hover-handles .react-resizable-handle {
+    display: none;
+}
+.hover-handles:hover .react-resizable-handle {
+    display: block;
+}
+.absolutely-positioned {
+    position: absolute !important;
+}
+.left-aligned {
+    left: 0;
+}
+.right-aligned {
+    right: 0;
+}
+.top-aligned {
+    top: 0;
+}
+.bottom-aligned {
+    bottom: 0;
+}
+
+.custom-box {
+    overflow: visible;
+}
+.custom-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #1153aa;
+    opacity: 0.75;
+    border-radius: 4px;
+}
+.custom-handle-sw {
+    bottom: -4px;
+    left: -4px;
+    cursor: sw-resize;
+}
+.custom-handle-se {
+    bottom: -4px;
+    right: -4px;
+    cursor: se-resize;
+}
+.custom-handle-nw {
+    top: -4px;
+    left: -4px;
+    cursor: nw-resize;
+}
+.custom-handle-ne {
+    top: -4px;
+    right: -4px;
+    cursor: ne-resize;
+}
+.custom-handle-w,
+.custom-handle-e {
+    top: 50%;
+    margin-top: -4px;
+    cursor: ew-resize;
+}
+.custom-handle-w {
+    left: -4px;
+}
+.custom-handle-e {
+    right: -4px;
+}
+.custom-handle-n,
+.custom-handle-s {
+    left: 50%;
+    margin-left: -4px;
+    cursor: ns-resize;
+}
+.custom-handle-n {
+    top: -4px;
+}
+.custom-handle-s {
+    bottom: -4px;
+}

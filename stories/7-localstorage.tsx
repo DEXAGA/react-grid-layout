@@ -1,7 +1,7 @@
 import React from "react";
 import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout = RGL;
 const originalLayout = getFromLS("layout") || [];
 
 

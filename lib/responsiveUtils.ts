@@ -1,48 +1,8 @@
 // @flow
 
-import { cloneLayout, compact, correctBounds } from "./utils";
+import type {Layout} from "./utils";
+import {compact, correctBounds} from "./utils";
 
-import type { CompactType, Layout } from "./utils";
-
-/**
- * Given a width, find the highest breakpoint that matches is valid for it (width > breakpoint).
- *
- * @param  {Object} breakpoints Breakpoints object (e.g. {lg: 1200, md: 960, ...})
- * @param  {Number} width Screen width.
- * @return {String}       Highest breakpoint that is less than width.
- */
-export function getBreakpointFromWidth(
-  breakpoints: { [x: string]: number; } ,
-  width: number
-)  {
-  const sorted = sortBreakpoints(breakpoints);
-  let matching = sorted[0];
-  for (let i = 1, len = sorted.length; i < len; i++) {
-    const breakpointName = sorted[i];
-    if (width > breakpoints[breakpointName]) matching = breakpointName;
-  }
-  return matching;
-}
-
-/**
- * Given a breakpoint, get the # of cols set for it.
- * @param  {String} breakpoint Breakpoint name.
- * @param  {Object} cols       Map of breakpoints to cols.
- * @return {Number}            Number of cols.
- */
-export function getColsFromBreakpoint(
-  breakpoint: string,
-  cols: { [x: string]: number; }
-): number {
-  if (!cols[breakpoint]) {
-    throw new Error(
-      "ResponsiveReactGridLayout: `cols` entry for breakpoint " +
-        breakpoint +
-        " is missing!"
-    );
-  }
-  return cols[breakpoint];
-}
 
 /**
  * Given existing layouts and a new breakpoint, find or generate a new layout.
@@ -62,15 +22,19 @@ export function findOrGenerateResponsiveLayout(
   layouts: { [x: string]: any; },
   breakpoints: { [x: string]: number; },
   breakpoint: string,
-  lastBreakpoint: string ,
+  lastBreakpoint: string,
   cols: number,
   compactType:any
 ): Layout {
   // If it already exists, just return it.
-  if (layouts[breakpoint]) return cloneLayout(layouts[breakpoint]);
+  if (layouts[breakpoint]) return layouts[breakpoint];
   // Find or generate the next layout
   let layout = layouts[lastBreakpoint];
-  const breakpointsSorted = sortBreakpoints(breakpoints);
+  const keys: Array<string> = Object.keys(breakpoints);
+
+  const breakpointsSorted = keys.sort(function (a, b) {
+    return breakpoints[a] - breakpoints[b];
+  });
   const breakpointsAbove = breakpointsSorted.slice(
     breakpointsSorted.indexOf(breakpoint)
   );
@@ -81,22 +45,7 @@ export function findOrGenerateResponsiveLayout(
       break;
     }
   }
-  layout = cloneLayout(layout || []); // clone layout so we don't modify existing items
+  layout = layout || []; // clone layout so we don't modify existing items
   return compact(correctBounds(layout, { cols: cols }), compactType, cols);
 }
 
-/**
- * Given breakpoints, return an array of breakpoints sorted by width. This is usually
- * e.g. ['xxs', 'xs', 'sm', ...]
- *
- * @param  {Object} breakpoints Key/value pair of breakpoint names to widths.
- * @return {Array}              Sorted breakpoints.
- */
-export function sortBreakpoints(
-  breakpoints: { [x: string]: number; }
-)  {
-  const keys: Array<string> = Object.keys(breakpoints);
-  return keys.sort(function (a, b) {
-    return breakpoints[a] - breakpoints[b];
-  });
-}

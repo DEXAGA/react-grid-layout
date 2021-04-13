@@ -19,5 +19,9 @@
 
 //    "outFile": "dist/bundle.js"
   },
-  "include": ["lib"],
+  "include": [
+    "lib",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
 }

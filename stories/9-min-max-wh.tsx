@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout = RGL;
 
 const MinMaxLayout = (props) => {
   return (
@@ -12,7 +12,7 @@ const MinMaxLayout = (props) => {
             <ReactGridLayout onLayoutChange={(layout) => {
               props.onLayoutChange(layout);
             }} {...props}>
-              {_.map(_.map(new Array(props.items), function(item, i) {
+              {_.map(_.map(new Array(props.items), (item, i) => {
                 const minW = _.random(1, 6),
                         minH = _.random(1, 6);
                 const maxW = _.random(minW, 6),
@@ -30,7 +30,7 @@ const MinMaxLayout = (props) => {
                   minH,
                   maxH
                 };
-              }), function(l) {
+              }), l => {
                 const mins = [l.minW, l.minH],
                         maxes = [l.maxW, l.maxH];
                 return (

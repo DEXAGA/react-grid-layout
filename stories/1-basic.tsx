@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout = RGL;
 
 const BasicLayout = (props) => {
 
@@ -40,10 +40,10 @@ const BasicLayout = (props) => {
                             onLayoutChange={(layout) => {
                               props.onLayoutChange(layout);
                             }}
-                            {...props}
                             containerPadding={[paddingX, paddingY]}
                             margin={[marginX, marginY]}
                             rowHeight={state.height / 12 - marginY / 12 - paddingY / 12}
+                            {...props}
                     >
                       {_.map(_.range(props.items), function(i) {
                         return (

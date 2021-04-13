@@ -1,42 +1,35 @@
 import React from "react";
 import RGL, {WidthProvider} from "react-grid-layout-hooks";
 
-const ReactGridLayout = WidthProvider(RGL);
+const ReactGridLayout = RGL;
 
 const ErrorCaseLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layout: undefined
+    layout: [
+      {
+        x: 0,
+        y: 0,
+        w: 1,
+        h: 1,
+        i: "1"
+      },
+      {
+        x: 1,
+        y: 0,
+        w: 1,
+        h: 1,
+        i: "2"
+      },
+      {
+        x: 0,
+        y: 1,
+        w: 2,
+        h: 2,
+        i: "3"
+      }
+    ]
   })
-
-  React.useEffect(() => {
-    setState({
-      layout: [
-        {
-          x: 0,
-          y: 0,
-          w: 1,
-          h: 1,
-          i: "1"
-        },
-        {
-          x: 1,
-          y: 0,
-          w: 1,
-          h: 1,
-          i: "2"
-        },
-        {
-          x: 0,
-          y: 1,
-          w: 2,
-          h: 2,
-          i: "3"
-        }
-      ]
-    });
-
-  }, [])
 
   return (
           <div style={{

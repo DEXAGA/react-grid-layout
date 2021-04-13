@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import isEqual from "lodash.isequal";
 import React from "react";
@@ -78,97 +77,6 @@ export function bottom(layout: Layout): number {
   return max;
 }
 
-export function cloneLayout(layout: Layout): Layout {
-  const newLayout = Array(layout.length);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    newLayout[i] = cloneLayoutItem(layout[i]);
-  }
-  return newLayout;
-}
-
-// Modify a layoutItem inside a layout. Returns a new Layout,
-// does not mutate. Carries over all other LayoutItems unmodified.
-export function modifyLayout(layout: Layout, layoutItem: LayoutItem): Layout {
-  const newLayout = Array(layout.length);
-  for (let i = 0, len = layout.length; i < len; i++) {
-    if (layoutItem.i === layout[i].i) {
-      newLayout[i] = layoutItem;
-    } else {
-      newLayout[i] = layout[i];
-    }
-  }
-  return newLayout;
-}
-
-// Function to be called to modify a layout item.
-// Does defensive clones to ensure the layout is not modified.
-export function withLayoutItem(
-  layout: Layout,
-  itemKey: string,
-  cb: { (l: { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }): { i: any; x: any; y: any; w: any; h: any; minW?: number | undefined; minH?: number | undefined; maxW?: number | undefined; maxH?: number | undefined; moved?: boolean | undefined; static?: boolean | undefined; isDraggable?: boolean | undefined; isResizable?: boolean | undefined; resizeHandles?: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[] | undefined; isBounded?: boolean | undefined; }; (arg0: LayoutItem): Readonly<LayoutItem> | undefined; }
-) :any {
-  let item = getLayoutItem(layout, itemKey);
-  if (!item) return [layout, null];
-  item = cb(cloneLayoutItem(item)); // defensive clone then modify
-  // FIXME could do this faster if we already knew the index
-  layout = modifyLayout(layout, item);
-  return [layout, item];
-}
-
-// Fast path to cloning, since this is monomorphic
-export function cloneLayoutItem(layoutItem: LayoutItem): LayoutItem {
-  return {
-    w: layoutItem.w,
-    h: layoutItem.h,
-    x: layoutItem.x,
-    y: layoutItem.y,
-    i: layoutItem.i,
-    minW: layoutItem.minW,
-    maxW: layoutItem.maxW,
-    minH: layoutItem.minH,
-    maxH: layoutItem.maxH,
-    moved: Boolean(layoutItem.moved),
-    static: Boolean(layoutItem.static),
-    // These can be null/undefined
-    isDraggable: layoutItem.isDraggable,
-    isResizable: layoutItem.isResizable,
-    resizeHandles: layoutItem.resizeHandles,
-    isBounded: layoutItem.isBounded
-  };
-}
-
-/**
- * Comparing React `children` is a bit difficult. This is a good way to compare them.
- * This will catch differences in keys, order, and length.
- */
-export function childrenEqual(a: any, b: any): boolean {
-  return isEqual(
-    React.Children.map(a, c => c.key),
-    React.Children.map(b, c => c.key)
-  );
-}
-
-/**
- * See `fastRGLPropsEqual.ts`.
- * We want this to run as fast as possible - it is called often - and to be
- * resilient to new props that we add. So rather than call lodash.isEqual,
- * which isn't suited to comparing props very well, we use this specialized
- * function in conjunction with preval to generate the fastest possible comparison
- * function, tuned for exactly our props.
- */
-type FastRGLPropsEqual = (obj:Object, obj2:Object, func:Function) => boolean;
-export const fastRGLPropsEqual: FastRGLPropsEqual = require("./fastRGLPropsEqual");
-
-// Like the above, but a lot simpler.
-export function fastPositionEqual(a: Position, b: Position): boolean {
-  return (
-    a.left === b.left &&
-    a.top === b.top &&
-    a.width === b.width &&
-    a.height === b.height
-  );
-}
-
 /**
  * Given two layoutitems, check if they collide.
  */
@@ -205,7 +113,9 @@ export function compact(
   const out = Array(layout.length);
 
   for (let i = 0, len = sorted.length; i < len; i++) {
-    let l = cloneLayoutItem(sorted[i]);
+    let l = {
+      ...(sorted[i])
+    };
 
     // Don't move static elements
     if (!l.static) {
@@ -353,19 +263,6 @@ export function correctBounds(
 }
 
 /**
- * Get a layout item by ID. Used so we can override later on if necessary.
- *
- * @param  {Array}  layout Layout array.
- * @param  {String} id     ID
- * @return {LayoutItem}    Item at ID.
- */
-export function getLayoutItem(layout: Layout, id: string)  {
-  for (let i = 0, len = layout.length; i < len; i++) {
-    if (layout[i].i === id) return layout[i];
-  }
-}
-
-/**
  * Returns the first item this layout collides with.
  * It doesn't appear to matter which order we approach this from, although
  * perhaps that is the wrong thing to do.
@@ -425,9 +322,9 @@ export function moveElement(
   // Short-circuit if nothing to do.
   if (l.y === y && l.x === x) return layout;
 
-  log(
-    `Moving element ${l.i} to [${String(x)},${String(y)}] from [${l.x},${l.y}]`
-  );
+  // log(
+  //   `Moving element ${l.i} to [${String(x)},${String(y)}] from [${l.x},${l.y}]`
+  // );
   const oldX = l.x;
   const oldY = l.y;
 
@@ -453,7 +350,7 @@ export function moveElement(
 
   // There was a collision; abort
   if (preventCollision && collisions.length) {
-    log(`Collision prevented on ${l.i}, reverting.`);
+    // log(`Collision prevented on ${l.i}, reverting.`);
     l.x = oldX;
     l.y = oldY;
     l.moved = false;
@@ -463,9 +360,9 @@ export function moveElement(
   // Move each item that collides away from this element.
   for (let i = 0, len = collisions.length; i < len; i++) {
     const collision = collisions[i];
-    log(
-      `Resolving collision between ${l.i} at [${l.x},${l.y}] and ${collision.i} at [${collision.x},${collision.y}]`
-    );
+    // log(
+    //   `Resolving collision between ${l.i} at [${l.x},${l.y}] and ${collision.i} at [${collision.x},${collision.y}]`
+    // );
 
     // Short circuit so we can't infinite loop
     if (collision.moved) continue;
@@ -534,9 +431,9 @@ export function moveElementAwayFromCollision(
 
     // No collision? If so, we can go up there; otherwise, we'll end up moving down as normal
     if (!getFirstCollision(layout, fakeItem)) {
-      log(
-        `Doing reverse collision on ${itemToMove.i} up to [${fakeItem.x},${fakeItem.y}].`
-      );
+      // log(
+      //   `Doing reverse collision on ${itemToMove.i} up to [${fakeItem.x},${fakeItem.y}].`
+      // );
       return moveElement(
         layout,
         itemToMove,
@@ -551,41 +448,6 @@ export function moveElementAwayFromCollision(
   }
 
   return moveElement(layout, itemToMove, compactH ? itemToMove.x + 1 : undefined, compactV ? itemToMove.y + 1 : undefined, isUserAction, preventCollision, compactType, cols);
-}
-
-/**
- * Helper to convert a number to a percentage string.
- *
- * @param  {Number} num Any number
- * @return {String}     That number as a percentage.
- */
-export function perc(num: number): string {
-  return num * 100 + "%";
-}
-
-export function setTransform({ top, left, width, height }: Position) {
-  // Replace unitless items with px
-  const translate = `translate(${left}px,${top}px)`;
-  return {
-    transform: translate,
-    WebkitTransform: translate,
-    MozTransform: translate,
-    msTransform: translate,
-    OTransform: translate,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: "absolute"
-  };
-}
-
-export function setTopLeft({ top, left, width, height }: Position) {
-  return {
-    top: `${top}px`,
-    left: `${left}px`,
-    width: `${width}px`,
-    height: `${height}px`,
-    position: "absolute"
-  };
 }
 
 /**
@@ -657,9 +519,11 @@ export function synchronizeLayoutWithChildren(
   const layout: LayoutItem[] = [];
   React.Children.forEach(children, (child, i: number) => {
     // Don't overwrite if it already exists.
-    const exists = getLayoutItem(initialLayout, String(child.key));
+    const exists = initialLayout.find(((value, index) => initialLayout[index].i === String(child.key)));
     if (exists) {
-      layout[i] = cloneLayoutItem(exists);
+      layout[i] = {
+        ...(exists)
+      };
     } else {
       if (!isProduction && child.props._grid) {
         console.warn(
@@ -675,17 +539,21 @@ export function synchronizeLayoutWithChildren(
           validateLayout([g], "ReactGridLayout.children");
         }
         // FIXME clone not really necessary here
-        layout[i] = cloneLayoutItem({ ...g, i: child.key });
+        layout[i] = {
+          ...({...g, i: child.key})
+        };
       } else {
         // Nothing provided: ensure this is added to the bottom
         // FIXME clone not really necessary here
-        layout[i] = cloneLayoutItem({
-          w: 1,
-          h: 1,
-          x: 0,
-          y: bottom(layout),
-          i: String(child.key)
-        });
+        layout[i] = {
+          ...({
+            w: 1,
+            h: 1,
+            x: 0,
+            y: bottom(layout),
+            i: String(child.key)
+          })
+        };
       }
     }
   });
@@ -742,23 +610,3 @@ export function validateLayout(
   }
 }
 
-// Legacy support for verticalCompact: false
-export function compactType(
-  props: { layout?: any; children?: any; cols?: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any; }
-): CompactType {
-  const { verticalCompact, compactType }:any = props || {};
-  return verticalCompact === false ? null : compactType;
-}
-
-// Flow can't really figure this out, so we just use Object
-export function autoBindHandlers(el: Record<any,any>, fns: Array<string>): void {
-  fns.forEach(key => (el[key] = el[key].bind(el)));
-}
-
-function log(...args: string[]) {
-  if (!DEBUG) return;
-  // eslint-disable-next-line no-console
-  console.log(...args);
-}
-
-export const noop = () => {};

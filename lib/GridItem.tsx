@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React from "react";
-import {DraggableCore} from "react-draggable";
-import {Resizable} from "react-resizable";
+import {DraggableCore} from "react-draggable-hooks";
+import {Resizable} from "react-resizable-hooks";
 import {calcGridItemPosition, calcWH, calcXY, clamp} from "./calculateUtils";
 
 
@@ -85,7 +85,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
               props.h
       );
 
-      props.onDragStart.call(this, props.i, x, y, {
+      props.onDragStart.call(GridItem, props.i, x, y, {
         e: droppingPosition.e,
         node,
         newPosition1
@@ -136,7 +136,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
 
       // Call callback with this data
       const {x, y} = calcXY(positionParams, top, left, props.w, props.h);
-      props.onDrag.call(this, props.i, x, y, {
+      props.onDrag.call(GridItem, props.i, x, y, {
         e: droppingPosition.e,
         node,
         newPosition1
@@ -198,117 +198,130 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
       style.width = newPosition.width / props.containerWidth * 100 + "%";
     }
   }
+
+  function handleDragStart(node: HTMLElement, e: Event) {
+    if (!props.onDragStart) return;
+
+    const newPosition = {top: 0, left: 0};
+
+    // TODO: this wont work on nested parents
+    const {offsetParent} = node;
+    if (!offsetParent) return;
+    const parentRect = offsetParent.getBoundingClientRect();
+    const clientRect = node.getBoundingClientRect();
+    const cLeft = clientRect.left / props.transformScale;
+    const pLeft = parentRect.left / props.transformScale;
+    const cTop = clientRect.top / props.transformScale;
+    const pTop = parentRect.top / props.transformScale;
+    newPosition.left = cLeft - pLeft + offsetParent.scrollLeft;
+    newPosition.top = cTop - pTop + offsetParent.scrollTop;
+    // @ts-ignore
+    setState(prevState => ({
+      ...prevState,
+      dragging: newPosition,
+    }));
+
+    // Call callback with this data
+    const {x, y} = calcXY(
+            positionParams,
+            newPosition.top,
+            newPosition.left,
+            props.w,
+            props.h
+    );
+
+    return props.onDragStart.call(GridItem, props.i, x, y, {
+      e,
+      node,
+      newPosition
+    });
+  }
+
+  function handleDrag(deltaY: number, deltaX: number, node: HTMLElement, e: Event) {
+    if (!props.onDrag) return;
+
+    if (!state.dragging) {
+      throw new Error("onDrag called before onDragStart.");
+    }
+    // @ts-ignore
+    let top = state?.dragging?.top + deltaY;
+    // @ts-ignore
+    let left = state?.dragging?.left + deltaX;
+
+
+    // Boundary calculations; keeps items within the grid
+    if (props.isBounded) {
+
+      if (node.offsetParent) {
+        const rowHeight = (
+                (props.containerHeight - (props.margin)[1] * (props.cols - 1) - (props.containerPadding)[1] * 2) / props.cols
+        );
+        const bottomBoundary =
+                props.containerHeight - (!Number.isFinite(props.h) ? props.h : Math.round(rowHeight * props.h + Math.max(0, props.h - 1) * (props.margin)[1]));
+        top = clamp(top, 0, bottomBoundary);
+
+        const colWidth = (
+                (props.containerWidth - (props.margin)[0] * (props.cols - 1) - (props.containerPadding)[0] * 2) / props.cols
+        );
+        const rightBoundary =
+                props.containerWidth - (!Number.isFinite(props.w) ? props.w : Math.round(colWidth * props.w + Math.max(0, props.w - 1) * (props.margin)[0]));
+        left = clamp(left, 0, rightBoundary);
+      }
+    }
+
+    const newPosition = {top, left};
+    // @ts-ignore
+    setState(prevState => ({
+      ...prevState,
+      dragging: newPosition,
+    }));
+
+    // Call callback with this data
+    const {x, y} = calcXY(positionParams, top, left, props.w, props.h);
+    return props.onDrag.call(GridItem, props.i, x, y, {
+      e,
+      node,
+      newPosition
+    });
+  }
+
+  function handleDragStop(e: Event, node: HTMLElement) {
+    if (!props.onDragStop) return;
+
+    if (!state.dragging) {
+      throw new Error("onDragEnd called before onDragStart.");
+    }
+
+    const newPosition = {top: state.dragging.top, left: state.dragging.left};
+    setState(prevState => ({
+      ...prevState,
+      dragging: null,
+    }));
+
+    const {x, y} = calcXY(positionParams, state.dragging.top, state.dragging.left, props.w, props.h);
+
+    return props.onDragStop.call(GridItem, props.i, x, y, {
+      e,
+      node,
+      newPosition
+    });
+  }
+
   return (
           // @ts-ignore
           <DraggableCore
                   disabled={!props.isDraggable}
                   onStart={(e: Event, {node}: any) => {
-                    if (!props.onDragStart) return;
-
-                    const newPosition = {top: 0, left: 0};
-
-                    // TODO: this wont work on nested parents
-                    const {offsetParent} = node;
-                    if (!offsetParent) return;
-                    const parentRect = offsetParent.getBoundingClientRect();
-                    const clientRect = node.getBoundingClientRect();
-                    const cLeft = clientRect.left / props.transformScale;
-                    const pLeft = parentRect.left / props.transformScale;
-                    const cTop = clientRect.top / props.transformScale;
-                    const pTop = parentRect.top / props.transformScale;
-                    newPosition.left = cLeft - pLeft + offsetParent.scrollLeft;
-                    newPosition.top = cTop - pTop + offsetParent.scrollTop;
-                    // @ts-ignore
-                    setState(prevState => ({
-                      ...prevState,
-                      dragging: newPosition,
-                    }));
-
-                    // Call callback with this data
-                    const {x, y} = calcXY(
-                            positionParams,
-                            newPosition.top,
-                            newPosition.left,
-                            props.w,
-                            props.h
-                    );
-
-                    return props.onDragStart.call(this, props.i, x, y, {
-                      e,
-                      node,
-                      newPosition
-                    });
+                    return handleDragStart(node, e);
                   }}
                   onDrag={(
                           e: Event,
                           {node, deltaX, deltaY}: { node: any, deltaX: any, deltaY: any }
                   ) => {
-                    if (!props.onDrag) return;
-
-                    if (!state.dragging) {
-                      throw new Error("onDrag called before onDragStart.");
-                    }
-                    // @ts-ignore
-                    let top = state?.dragging?.top + deltaY;
-                    // @ts-ignore
-                    let left = state?.dragging?.left + deltaX;
-
-
-                    // Boundary calculations; keeps items within the grid
-                    if (props.isBounded) {
-
-                      if (node.offsetParent) {
-                        const rowHeight = (
-                                (props.containerHeight - (props.margin)[1] * (props.cols - 1) - (props.containerPadding)[1] * 2) / props.cols
-                        );
-                        const bottomBoundary =
-                                props.containerHeight - (!Number.isFinite(props.h) ? props.h : Math.round(rowHeight * props.h + Math.max(0, props.h - 1) * (props.margin)[1]));
-                        top = clamp(top, 0, bottomBoundary);
-
-                        const colWidth = (
-                                (props.containerWidth - (props.margin)[0] * (props.cols - 1) - (props.containerPadding)[0] * 2) / props.cols
-                        );
-                        const rightBoundary =
-                                props.containerWidth - (!Number.isFinite(props.w) ? props.w : Math.round(colWidth * props.w + Math.max(0, props.w - 1) * (props.margin)[0]));
-                        left = clamp(left, 0, rightBoundary);
-                      }
-                    }
-
-                    const newPosition = {top, left};
-                    // @ts-ignore
-                    setState(prevState => ({
-                      ...prevState,
-                      dragging: newPosition,
-                    }));
-
-                    // Call callback with this data
-                    const {x, y} = calcXY(positionParams, top, left, props.w, props.h);
-                    return props.onDrag.call(this, props.i, x, y, {
-                      e,
-                      node,
-                      newPosition
-                    });
+                    return handleDrag(deltaY, deltaX, node, e);
                   }}
                   onStop={(e: Event, {node}: any) => {
-                    if (!props.onDragStop) return;
-
-                    if (!state.dragging) {
-                      throw new Error("onDragEnd called before onDragStart.");
-                    }
-
-                    const newPosition = {top: state.dragging.top, left: state.dragging.left};
-                    setState(prevState => ({
-                      ...prevState,
-                      dragging: null,
-                    }));
-
-                    const {x, y} = calcXY(positionParams, state.dragging.top, state.dragging.left, props.w, props.h);
-
-                    return props.onDragStop.call(this, props.i, x, y, {
-                      e,
-                      node,
-                      newPosition
-                    });
+                    return handleDragStop(e, node);
                   }}
                   handle={props.handle}
                   cancel={
@@ -407,7 +420,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
                         }));
                       }
 
-                      props.onResizeStop.call(this, props.i, w, h, {
+                      props.onResizeStop.call(GridItem, props.i, w, h, {
                         e,
                         node: callbackData.node,
                         size: callbackData.size,
@@ -458,7 +471,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
                         resizeStartPos: newPosition
                       }));
 
-                      props.onResizeStart.call(this, props.i, w, h, {
+                      props.onResizeStart.call(GridItem, props.i, w, h, {
                         e,
                         node: callbackData.node,
                         size: newPosition,
@@ -519,7 +532,8 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
                           }));
                         } else {
                           if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
-                            callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+                            // console.log(callbackData)
+                            callbackData.size.left = currentLeft - callbackData.size.deltaX;
                             callbackData.size.top = currentTop;
                           } else if (
                                   ["n", "ne"].indexOf(callbackData.handle) !== -1
@@ -533,13 +547,14 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
                           callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
                           callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
                         }
+                        callbackData.size.left = state.resizing + callbackData.size.deltaX
                         setState(prevState => ({
                           ...prevState,
-                          resizing: callbackData.size
+                          resizing: callbackData.size,
                         }));
                       }
 
-                      props.onResize.call(this, props.i, w, h, {
+                      props.onResize.call(GridItem, props.i, w, h, {
                         e,
                         node: elem,
                         size: callbackData.size,

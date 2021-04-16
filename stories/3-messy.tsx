@@ -1,7 +1,7 @@
 // @flow
 import _ from "lodash";
 import * as React from "react";
-import RGL from '../lib/ResponsiveReactGridLayout';
+import RGL from '../lib/ReactGridLayout';
 
 const ReactGridLayout = RGL;
 

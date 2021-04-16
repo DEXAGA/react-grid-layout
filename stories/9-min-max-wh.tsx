@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import RGL from '../lib/ResponsiveReactGridLayout';
+import RGL from '../lib/ReactGridLayout';
 
 const ReactGridLayout = RGL;
 

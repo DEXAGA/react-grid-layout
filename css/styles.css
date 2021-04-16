@@ -117,6 +117,13 @@
   bottom: 0;
   transform: rotate(45deg);
 }
+
+
+
+/*Resizable*/
+
+
+
 .react-resizable {
   position: relative;
 }

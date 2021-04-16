@@ -133,8 +133,6 @@ const Resizable = (props) => {
     };
   }
 
-  // Pass along only props not meant for the `<Resizable>`.`
-  // eslint-disable-next-line no-unused-vars
 
   // What we're doing here is getting the child of this element, and cloning it with this element's props.
   // We are then defining its children as:
@@ -147,7 +145,7 @@ const Resizable = (props) => {
       props.children.props.children,
       ...props.resizeHandles.map((handleAxis) => (
               <DraggableCore
-                      {...(props.draggableOpts)}
+                      {...(props.draggableOpts ?? {})}
                       key={`resizableHandle-${handleAxis}`}
                       onStop={resizeHandler('onResizeStop', handleAxis)}
                       onStart={resizeHandler('onResizeStart', handleAxis)}

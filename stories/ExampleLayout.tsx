@@ -1,6 +1,6 @@
 import * as React from 'react';
-import '../../react-resizable-hooks/css/styles.css';
-import '../../react-resizable-hooks/stories/example.css';
+import '../css/styles.css';
+import './example.css';
 import Resizable from "../lib/Resizable";
 import ResizableBox from "../lib/ResizableBox";
 

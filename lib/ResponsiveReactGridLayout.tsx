@@ -188,7 +188,7 @@ const ResponsiveReactGridLayout = (props) => {
 
 ResponsiveReactGridLayout.defaultProps = {
   breakpoints: {lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0},
-  cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
+  cols: {lg: 12, md: 10, sm: 6, xs: 1, xxs: 1},
   containerPadding: [10, 10],
   layouts: {},
   margin: [10, 10],

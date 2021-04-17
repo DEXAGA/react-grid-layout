@@ -13,9 +13,7 @@ const ResponsiveLocalStorageLayout = () => {
   const resetLayout = () => {
     setState(prevState => ({
       ...prevState,
-      layouts: {
-        lg: null
-      }
+      layouts: undefined
     }));
   }
 
@@ -30,9 +28,8 @@ const ResponsiveLocalStorageLayout = () => {
   return (
           <div>
             <button onClick={() => resetLayout()}>Reset Layout</button>
-            {state?.layouts && (
                     <ResponsiveReactGridLayout
-                            cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
+                            cols={{lg: 12, md: 10, sm: 6, xs: 1, xxs: 1}}
                             layouts={state.layouts}
                             onLayoutChange={(layout, layouts) => {
                               onLayoutChange(layout, layouts);
@@ -59,7 +56,6 @@ const ResponsiveLocalStorageLayout = () => {
                         <span className="text">5</span>
                       </div>
                     </ResponsiveReactGridLayout>
-            )}
           </div>
   );
 }

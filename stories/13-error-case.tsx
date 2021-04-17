@@ -35,12 +35,9 @@ const ErrorCaseLayout = (props) => {
           }}>
             {state?.layout && (
                     <ReactGridLayout
-                            
+
                             layout={state.layout}
                             cols={2}
-                            onLayoutChange={(layout) => {
-                              props.onLayoutChange(layout);
-                            }}
                     >
                       {[
                         <div key={"1"}>

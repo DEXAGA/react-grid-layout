@@ -25,6 +25,7 @@ const GridItem = (props: { layout: Layout, [x: string]: any; cols?: any; contain
     margin: props.margin,
     maxRows: props.maxRows,
     rowHeight: props.rowHeight,
+    // nbRows: clamp(props.nbRows, 0, 12)
     nbRows: props.nbRows
   };
   React.useEffect(() => {
@@ -465,6 +466,7 @@ const GridItem = (props: { layout: Layout, [x: string]: any; cols?: any; contain
                       w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
                       h = clamp(h, props.minH, props.maxH);
 
+
                       setState(prevState => ({
                         ...prevState,
                         resizing: newPosition,
@@ -554,6 +556,7 @@ const GridItem = (props: { layout: Layout, [x: string]: any; cols?: any; contain
                           resizing: callbackData.size,
                         }));
                       }
+
 
                       props.onResize.call(GridItem, props.i, w, h, {
                         e,

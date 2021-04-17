@@ -3,9 +3,7 @@ import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const StaticElementsLayout = (props) => {
   return (
-      <ReactGridLayout
-        
-      >
+      <ReactGridLayout>
         <div key="1" data-grid={{ x: 0, y: 0, w: 2, h: 3 }}>
           <span className="text">1</span>
         </div>

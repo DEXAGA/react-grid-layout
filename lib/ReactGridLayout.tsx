@@ -418,7 +418,6 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
 
     // Re-compact the newLayout and set the drag placeholder.
     // @ts-ignore
-    // @ts-ignore
     setState(prevState => ({
       ...prevState,
       layout: compact(finalLayout, props.verticalCompact === false ? null : props.compactType, props.cols),

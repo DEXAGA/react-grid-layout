@@ -1,70 +1,53 @@
 import _ from "lodash";
 import React from "react";
-import RGL from "../lib/ReactGridLayout";
-
-const ReactGridLayout = RGL;
+import ResponsiveReactGridLayout from "../lib/ResponsiveReactGridLayout";
 
 const BasicLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layout: undefined,
+    layout: null,
     height: undefined
   })
 
   React.useEffect(() => {
-    setState({...state,
-      layout: _.map(new Array(props.items), function(item, i) {
-        const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
-        return {
-          x: (i * 2) % 12,
-          y: Math.floor(i / 6) * y,
-          w: 2,
-          h: y,
-          i: i.toString()
-        };
-      })
-    })
+    setState(prevState => ({
+      ...prevState,
+      layout: {
+        lg: _.map(new Array(20), function(item, i) {
+          const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
+          return {
+            x: (i * 2) % 12,
+            y: Math.floor(i / 6) * y,
+            w: 2,
+            h: y,
+            i: i.toString()
+          };
+        })
+      }
+    }))
   }, [])
 
-  const paddingX = 10;
-  const paddingY = 10;
-  const marginX = 10;
-  const marginY = 10;
   return (
           <div style={{
             height: `100%`
           }}>
             {state?.layout && (
-                    <ReactGridLayout
-                            layout={state.layout}
-                            onLayoutChange={(layout) => {
-                              props.onLayoutChange(layout);
-                            }}
-                            containerPadding={[paddingX, paddingY]}
-                            margin={[marginX, marginY]}
-                            rowHeight={state.height / 12 - marginY / 12 - paddingY / 12}
-                            {...props}
+                    <ResponsiveReactGridLayout
+                            cols={12}
+                            rows={12}
+                            layouts={state.layout}
                     >
-                      {_.map(_.range(props.items), function(i) {
+                      {_.map(_.range(20), function(i) {
                         return (
                                 <div key={i}>
                                   <span className="text">{i}</span>
                                 </div>
                         );
                       })}
-                    </ReactGridLayout>
+                    </ResponsiveReactGridLayout>
             )}
           </div>
   );
 }
-
-BasicLayout.defaultProps = {
-  className: "layout",
-  items: 20,
-  rowHeight: 30,
-  onLayoutChange: function() {
-  },
-  cols: 12
-};
 
 export default BasicLayout

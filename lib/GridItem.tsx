@@ -3,12 +3,20 @@ import React from "react";
 import DraggableCore from "./DraggableCore";
 import Resizable from "./Resizable";
 import {calcGridItemPosition, calcWH, calcXY, clamp} from "./calculateUtils";
+import {Layout} from "./utils";
 
 
 /**
  * An individual item within a ReactGridLayout.
  */
-const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any; containerWidth?: any; containerHeight?: any; margin?: any; maxRows?: any; rowHeight?: any; w?: any; h?: any; i?: any; x?: any; minW?: any; minH?: any; maxW?: any; maxH?: any; y?: any; isDraggable?: any; handle?: any; cancel?: any; transformScale?: any; isResizable?: any; resizeHandles?: any; resizeHandle?: any; children?: any; className?: any; static?: any; droppingPosition?: any; useCSSTransforms?: any; style?: any; onDragStart?: any; onDrag?: any; isBounded?: any; onDragStop?: any; usePercentages?: any; }) => {
+const GridItem = (props: { layout: Layout, [x: string]: any; cols?: any; containerPadding?: any; containerWidth?: any; containerHeight?: any; margin?: any; maxRows?: any; rowHeight?: any; w?: any; h?: any; i?: any; x?: any; minW?: any; minH?: any; maxW?: any; maxH?: any; y?: any; isDraggable?: any; handle?: any; cancel?: any; transformScale?: any; isResizable?: any; resizeHandles?: any; resizeHandle?: any; children?: any; className?: any; static?: any; droppingPosition?: any; useCSSTransforms?: any; style?: any; onDragStart?: any; onDrag?: any; isBounded?: any; onDragStop?: any; usePercentages?: any; }) => {
+
+  const [state, setState] = React.useState({
+    resizing: null,
+    dragging: null,
+    className: ""
+  })
+
   const positionParams = {
     cols: props.cols,
     containerPadding: props.containerPadding,
@@ -17,12 +25,8 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
     margin: props.margin,
     maxRows: props.maxRows,
     rowHeight: props.rowHeight,
+    nbRows: props.nbRows
   };
-  const [state, setState] = React.useState({
-    resizing: null,
-    dragging: null,
-    className: ""
-  })
   React.useEffect(() => {
     setState(prevState => ({
       ...prevState,
@@ -288,10 +292,6 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
   function handleDragStop(e: Event, node: HTMLElement) {
     if (!props.onDragStop) return;
 
-    if (!state.dragging) {
-      throw new Error("onDragEnd called before onDragStart.");
-    }
-
     const newPosition = {top: state.dragging.top, left: state.dragging.left};
     setState(prevState => ({
       ...prevState,
@@ -548,6 +548,7 @@ const GridItem = (props: { [x: string]: any; cols?: any; containerPadding?: any;
                           callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
                         }
                         callbackData.size.left = state.resizing + callbackData.size.deltaX
+                        callbackData.size.top = state.resizing + callbackData.size.deltaY
                         setState(prevState => ({
                           ...prevState,
                           resizing: callbackData.size,

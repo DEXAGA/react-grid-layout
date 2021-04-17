@@ -1,7 +1,5 @@
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const ErrorCaseLayout = (props) => {
 
@@ -37,11 +35,12 @@ const ErrorCaseLayout = (props) => {
           }}>
             {state?.layout && (
                     <ReactGridLayout
+                            
                             layout={state.layout}
+                            cols={2}
                             onLayoutChange={(layout) => {
                               props.onLayoutChange(layout);
                             }}
-                            {...props}
                     >
                       {[
                         <div key={"1"}>
@@ -59,14 +58,5 @@ const ErrorCaseLayout = (props) => {
           </div>
   );
 }
-
-ErrorCaseLayout.defaultProps = {
-  className: "layout",
-  items: 3,
-  rowHeight: 100,
-  onLayoutChange: function() {
-  },
-  cols: 2
-};
 
 export default ErrorCaseLayout

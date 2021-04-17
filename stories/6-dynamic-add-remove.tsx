@@ -1,8 +1,7 @@
 import React from "react";
-import {Responsive, WidthProvider} from "../index";
+import ResponsiveReactGridLayout from "../lib/ResponsiveReactGridLayout";
 import _ from "lodash";
 
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 function newLayout(prevState) {
   let lg = prevState.layouts.lg
@@ -21,7 +20,7 @@ function newLayout(prevState) {
 /**
  * This layout demonstrates how to use a grid with a dynamic number of elements.
  */
-const AddRemoveLayout = (props) => {
+const AddRemoveLayout = () => {
   const [state, setState] = React.useState({
     layouts: {
       lg: [0, 1, 2, 3, 4].map(function(i, key, list) {
@@ -39,10 +38,12 @@ const AddRemoveLayout = (props) => {
   })
 
   return (
-          <div>
+          <div style={{
+          height: `100%`,
+          width: `100%`
+          }}>
             <button onClick={() => {
-              /*eslint no-console: 0*/
-              console.log("adding", "n" + state.newCounter);
+              // console.log("adding", "n" + state.newCounter);
               setState(prevState => ({
                 ...prevState,
                 // Add a new item. It must have a unique key!
@@ -55,7 +56,6 @@ const AddRemoveLayout = (props) => {
             </button>
             <ResponsiveReactGridLayout
                     onLayoutChange={(layout) => {
-                      // props.onLayoutChange(layout);
                       setState(prevState => ({
                         ...prevState,
                         layout: layout
@@ -69,7 +69,8 @@ const AddRemoveLayout = (props) => {
                       }));
                     }}
                     layouts={state.layouts}
-                    {...props}
+
+                    cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
             >
               {state?.layouts?.lg.map(el => {
                 let i = el.add ? "+" : el.i;
@@ -121,11 +122,5 @@ const AddRemoveLayout = (props) => {
           </div>
   );
 }
-
-AddRemoveLayout.defaultProps = {
-  className: "layout",
-  cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
-  rowHeight: 100
-};
 
 export default AddRemoveLayout

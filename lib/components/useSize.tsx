@@ -13,11 +13,14 @@ const useSize = (elementRef) => {
     // fix: grid position error when node or parentNode display is none by window resize
     // #924 #1084
     if (node instanceof HTMLElement && node.offsetWidth && node.offsetHeight) {
-      setState(prevState => ({
-        ...prevState,
-        width: node.offsetWidth,
-        height: node.offsetHeight
-      }));
+      setState(prevState => {
+        let newVar = {
+          ...prevState,
+          width: node.offsetWidth,
+          height: node.offsetHeight
+        };
+        return newVar;
+      });
     }
   };
 

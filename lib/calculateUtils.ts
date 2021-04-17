@@ -31,7 +31,7 @@ export function calcGridItemPosition(
           (positionParams.containerWidth - (positionParams.margin)[0] * (positionParams.cols - 1) - (positionParams.containerPadding)[0] * 2) / positionParams.cols
   );
   const rowHeight = (
-          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.cols - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.cols
+          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.nbRows - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.nbRows
   );
   const out: Record<any,any> = {};
 
@@ -85,12 +85,12 @@ export function calcXY(
   w: number,
   h: number
 ): { x: number, y: number } {
-  const {margin, cols, maxRows} = positionParams;
+  const {margin, cols, maxRows, nbRows} = positionParams;
   const colWidth = (
           (positionParams.containerWidth - (positionParams.margin)[0] * (positionParams.cols - 1) - (positionParams.containerPadding)[0] * 2) / positionParams.cols
   );
   const rowHeight = (
-          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.cols - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.cols
+          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.nbRows - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.nbRows
   );
 
   // left = colWidth * x + margin * (x + 1)
@@ -105,7 +105,7 @@ export function calcXY(
 
   // Capping
   x = clamp(x, 0, cols - w);
-  y = clamp(y, 0, maxRows - h);
+  y = clamp(y, 0, nbRows - h);
   return { x, y };
 }
 
@@ -130,7 +130,7 @@ export function calcWH(
           (positionParams.containerWidth - (positionParams.margin)[0] * (positionParams.cols - 1) - (positionParams.containerPadding)[0] * 2) / positionParams.cols
   );
   const rowHeight = (
-          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.cols - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.cols
+          (positionParams.containerHeight - (positionParams.margin)[1] * (positionParams.nbRows - 1) - (positionParams.containerPadding)[1] * 2) / positionParams.nbRows
   );
 
   // width = colWidth * w - (margin * (w - 1))
@@ -146,7 +146,7 @@ export function calcWH(
     w = clamp(w, 0, positionParams.cols - x);
   }
 
-  h = clamp(h, 0, positionParams.maxRows - y);
+  h = clamp(h, 0, positionParams.nbRows - y);
   return { w, h };
 }
 

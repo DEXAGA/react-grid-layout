@@ -133,25 +133,29 @@ const Resizable = (props) => {
     };
   }
 
+  const {children, className, draggableOpts, width, height, handle, handleSize,
+    lockAspectRatio, axis, minConstraints, maxConstraints, onResize,
+    onResizeStop, onResizeStart, resizeHandles, transformScale, ...p} = props;
+
 
   // What we're doing here is getting the child of this element, and cloning it with this element's props.
   // We are then defining its children as:
   // Its original children (resizable's child's children), and
   // One or more draggable handles.
-  return cloneElement(props.children, {
-    ...props,
-    className: `${props.className ? `${(props.className)} ` : ''}react-resizable`,
+  return cloneElement(children, {
+    ...p,
+    className: `${className ? `${(className)} ` : ''}react-resizable`,
     children: [
-      props.children.props.children,
-      ...props.resizeHandles.map((handleAxis) => (
+      children.props.children,
+      ...resizeHandles.map((handleAxis) => (
               <DraggableCore
-                      {...(props.draggableOpts ?? {})}
+                      {...(draggableOpts ?? {})}
                       key={`resizableHandle-${handleAxis}`}
                       onStop={resizeHandler('onResizeStop', handleAxis)}
                       onStart={resizeHandler('onResizeStart', handleAxis)}
                       onDrag={resizeHandler('onResize', handleAxis)}
               >
-                {props.handle ? typeof props.handle === 'function' ? props.handle(handleAxis) : props.handle :
+                {handle ? typeof handle === 'function' ? handle(handleAxis) : handle :
                         <span className={`react-resizable-handle react-resizable-handle-${handleAxis}`}/>}
               </DraggableCore>
       ))

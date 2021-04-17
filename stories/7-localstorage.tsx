@@ -1,19 +1,16 @@
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
-const ReactGridLayout = RGL;
 const originalLayout = getFromLS("layout") || [];
 
 
 const LocalStorageLayout = (props) => {
 
-  const [state, setState] = React.useState({layout:undefined})
-
-  React.useEffect(() => {
-    setState({
-      layout: JSON.parse(JSON.stringify(originalLayout))
-    })
-  }, [])
+  const [state, setState] = React.useState({
+    layout: {
+      lg: JSON.parse(JSON.stringify(originalLayout))
+    }
+  })
 
   return (
           <div style={{
@@ -21,20 +18,25 @@ const LocalStorageLayout = (props) => {
           }}>
             <button onClick={() => {
               setState({
-                layout: []
+                layout: null
               });
             }}>
               Reset Layout
             </button>
             {state?.layout && (
                     <ReactGridLayout
-                            {...props}
-                            layout={state.layout}
+
+                            cols={12}
+                            layouts={state.layout}
                             onLayoutChange={(layout) => {
                               /*eslint no-console: 0*/
                               saveToLS("layout", layout);
-                              setState({layout});
-                              props.onLayoutChange(layout); // updates status display
+                              setState(prevState => ({
+                                ...prevState,
+                                layout: {
+                                  lg: layout
+                                }
+                              }));
                             }}
                     >
                       <div key="1"
@@ -85,14 +87,5 @@ function saveToLS(key, value) {
     );
   }
 }
-
-
-LocalStorageLayout.defaultProps = {
-  className: "layout",
-  cols: 12,
-  rowHeight: 30,
-  onLayoutChange: function() {
-  }
-};
 
 export default LocalStorageLayout

@@ -1,8 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 /**
  * This layout demonstrates how to use the `onResize` handler to enforce a min/max width and height.

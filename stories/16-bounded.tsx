@@ -1,8 +1,6 @@
 import React from "react";
 import _ from "lodash";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ResponsiveReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const BoundedLayout = (props) => {
 
@@ -20,7 +18,7 @@ const BoundedLayout = (props) => {
   });
 
   return (
-      <ReactGridLayout
+      <ResponsiveReactGridLayout
         layout={state.layout}
         onLayoutChange={(layout) => {
           props.onLayoutChange(layout);
@@ -35,7 +33,7 @@ const BoundedLayout = (props) => {
                   </div>
           );
         })}
-      </ReactGridLayout>
+      </ResponsiveReactGridLayout>
     );
 }
 

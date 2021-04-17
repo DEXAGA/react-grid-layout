@@ -1,9 +1,6 @@
 import _ from "lodash";
 import * as React from "react";
-import RGL from '../lib/ResponsiveReactGridLayout';
-import {WidthProvider} from "../index";
-
-const ResponsiveReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const ShowcaseLayout = (props: {
   className?: "layout",
@@ -126,7 +123,7 @@ const ShowcaseLayout = (props: {
             height: `100vh`
           }}>
               {state?.layouts?.lg && (
-                      <ResponsiveReactGridLayout
+                      <ReactGridLayout
                               {...props}
                               layouts={state.layouts}
                               onBreakpointChange={(breakpoint) => {
@@ -169,7 +166,7 @@ const ShowcaseLayout = (props: {
                                   </div>
                           );
                         })}
-                      </ResponsiveReactGridLayout>
+                      </ReactGridLayout>
               )}
           </div>
   );

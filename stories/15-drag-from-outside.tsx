@@ -1,13 +1,13 @@
 import _ from "lodash";
 import React from "react";
-import {Responsive, WidthProvider} from "react-grid-layout-hooks";
-
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+import ResponsiveReactGridLayout from "../lib/ResponsiveReactGridLayout";
 
 const DragFromOutsideLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layouts: {lg: generateLayout()},
+    layouts: {
+      lg: generateLayout()
+    },
     currentBreakpoint: "lg",
     compactType: "vertical",
     mounted: false,

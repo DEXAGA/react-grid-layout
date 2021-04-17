@@ -1,8 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const MinMaxLayout = (props) => {
   return (

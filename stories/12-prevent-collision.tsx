@@ -1,22 +1,22 @@
 import _ from "lodash";
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const NoCollisionLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layout: _.map(new Array(props.items), function(item, i) {
-      const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
-      return {
-        x: (i * 2) % 12,
-        y: Math.floor(i / 6) * y,
-        w: 2,
-        h: y,
-        i: i.toString()
-      };
-    })
+    layout: {
+      lg: _.map(new Array(50), function(item, i) {
+        const y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
+        return {
+          x: (i * 2) % 12,
+          y: Math.floor(i / 6) * y,
+          w: 2,
+          h: y,
+          i: i.toString()
+        };
+      })
+    }
   })
 
   return (
@@ -25,13 +25,14 @@ const NoCollisionLayout = (props) => {
           }}>
             {state?.layout && (
                     <ReactGridLayout
-                            layout={state.layout}
-                            onLayoutChange={(layout) => {
-                              props.onLayoutChange(layout);
-                            }}
-                            {...props}
+                            layouts={state.layout}
+                            
+                            cols={12}
+                            rowHeight={30}
+                            verticalCompact={false}
+                            preventCollision={true}
                     >
-                      {_.map(_.range(props.items), function(i) {
+                      {_.map(_.range(50), function(i) {
                         return (
                                 <div key={i}>
                                   <span className="text">{i}</span>
@@ -43,19 +44,6 @@ const NoCollisionLayout = (props) => {
           </div>
   );
 }
-
-NoCollisionLayout.defaultProps = {
-  className: "layout",
-  items: 50,
-  cols: 12,
-  rowHeight: 30,
-  onLayoutChange: () => {
-  },
-  // This turns off compaction so you can place items wherever.
-  verticalCompact: false,
-  // This turns off rearrangement so items will not be pushed arround.
-  preventCollision: true
-};
 
 
 export default NoCollisionLayout

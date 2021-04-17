@@ -1,8 +1,6 @@
 import React from "react";
 import _ from "lodash";
-import {Responsive, WidthProvider} from "../index";
-
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+import ResponsiveReactGridLayout from "../lib/ResponsiveReactGridLayout";
 
 class ToolBoxItem extends React.Component<any,any> {
   render() {

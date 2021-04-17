@@ -1,22 +1,22 @@
 import _ from "lodash";
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const NoDraggingLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layout: _.map(new Array(props.items), function(item, i) {
-      var y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
-      return {
-        x: (i * 2) % 12,
-        y: Math.floor(i / 6) * y,
-        w: 2,
-        h: y,
-        i: i.toString()
-      };
-    })
+    layout: {
+      lg: _.map(new Array(50), function(item, i) {
+        var y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
+        return {
+          x: (i * 2) % 12,
+          y: Math.floor(i / 6) * y,
+          w: 2,
+          h: y,
+          i: i.toString()
+        };
+      })
+    }
   })
 
   return (
@@ -25,13 +25,13 @@ const NoDraggingLayout = (props) => {
           }}>
             {state?.layout && (
                     <ReactGridLayout
-                            layout={state.layout}
-                            onLayoutChange={(layout) => {
-                              props.onLayoutChange(layout);
-                            }}
-                            {...props}
+                            layouts={state.layout}
+                            
+                            isDraggable={false}
+                            isResizable={false}
+                            cols={12}
                     >
-                      {_.map(_.range(props.items), function(i) {
+                      {_.map(_.range(50), function(i) {
                         return (
                                 <div key={i}>
                                   <span className="text">{i}</span>
@@ -46,14 +46,6 @@ const NoDraggingLayout = (props) => {
 
 
 NoDraggingLayout.defaultProps = {
-  className: "layout",
-  isDraggable: false,
-  isResizable: false,
-  items: 50,
-  cols: 12,
-  rowHeight: 30,
-  onLayoutChange: function() {
-  }
 };
 
 export default NoDraggingLayout

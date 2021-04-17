@@ -1,17 +1,10 @@
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const StaticElementsLayout = (props) => {
   return (
       <ReactGridLayout
-              /* @ts-ignore */
-        className={"layout"}
-        onLayoutChange={(layout) => {
-          // props.onLayoutChange(layout);
-        }}
-        rowHeight={30}
+        
       >
         <div key="1" data-grid={{ x: 0, y: 0, w: 2, h: 3 }}>
           <span className="text">1</span>

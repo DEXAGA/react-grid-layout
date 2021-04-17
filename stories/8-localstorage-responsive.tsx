@@ -1,29 +1,21 @@
 import React from "react";
-import {Responsive, WidthProvider} from "../index";
-
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+import ResponsiveReactGridLayout from "../lib/ResponsiveReactGridLayout";
 
 /**
  * This layout demonstrates how to sync multiple responsive layouts to localstorage.
  */
-const ResponsiveLocalStorageLayout = (props) => {
+const ResponsiveLocalStorageLayout = () => {
 
   const [state, setState] = React.useState({
-    layouts: JSON.parse(JSON.stringify(getFromLS("layouts"))) || {}
+    layouts: JSON.parse(JSON.stringify(getFromLS("layouts")))
   });
-
-  // React.useEffect(() => {
-  //   setState(prevState => ({
-  //     ...prevState,
-  //     layouts: JSON.parse(JSON.stringify(getFromLS("layouts"))) || {}
-  //   }))
-  // }, [])
-
 
   const resetLayout = () => {
     setState(prevState => ({
       ...prevState,
-      layouts: {}
+      layouts: {
+        lg: null
+      }
     }));
   }
 
@@ -40,9 +32,7 @@ const ResponsiveLocalStorageLayout = (props) => {
             <button onClick={() => resetLayout()}>Reset Layout</button>
             {state?.layouts && (
                     <ResponsiveReactGridLayout
-                            className={"layout"}
                             cols={{lg: 12, md: 10, sm: 6, xs: 4, xxs: 2}}
-                            rowHeight={30}
                             layouts={state.layouts}
                             onLayoutChange={(layout, layouts) => {
                               onLayoutChange(layout, layouts);
@@ -74,12 +64,6 @@ const ResponsiveLocalStorageLayout = (props) => {
   );
 }
 
-ResponsiveLocalStorageLayout.defaultProps = {
-  className: "layout",
-  cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
-  rowHeight: 30
-}
-
 
 function getFromLS(key) {
   let ls = {};
@@ -90,7 +74,7 @@ function getFromLS(key) {
       /*Ignore*/
     }
   }
-  return ls[key];
+  return ls[key] ?? null;
 }
 
 function saveToLS(key, value) {

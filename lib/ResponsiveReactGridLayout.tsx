@@ -9,7 +9,6 @@ import ReactGridLayout from "./ReactGridLayout";
 import useSize from "./components/useSize";
 import classNames from "classnames";
 
-const type = (obj: any) => Object.prototype.toString.call(obj);
 
 /**
  * Get a value of margin or containerPadding.
@@ -161,7 +160,9 @@ const ResponsiveReactGridLayout = (props) => {
                  height: `100%`,
                  width: `100%`
                }}>
+            {(height && width) &&(
             <ReactGridLayout
+                    {...props}
                     className={classNames(layoutClassName, props.className)}
                     autoSize={props.autoSize}
                     children={props.children}
@@ -180,6 +181,7 @@ const ResponsiveReactGridLayout = (props) => {
                     layout={state.layout}
                     cols={state.cols}
             />
+            )}
           </div>
   );
 }

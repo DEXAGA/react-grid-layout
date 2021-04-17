@@ -1,19 +1,13 @@
 // @flow
 import _ from "lodash";
 import * as React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const MessyLayout = (props) => {
 
   const [state, setState] = React.useState({
-    layout: undefined
-  })
-
-  React.useEffect(() => {
-    setState({
-      layout: _.map(new Array(props.items), function(item, i) {
+    layout: {
+      lg: _.map(new Array(20), function(item, i) {
         const w = Math.ceil(Math.random() * 4);
         const y = Math.ceil(Math.random() * 4) + 1;
         return {
@@ -24,8 +18,8 @@ const MessyLayout = (props) => {
           i: i.toString()
         };
       })
-    })
-  }, [])
+    }
+  })
 
   return (
           <div style={{
@@ -33,13 +27,11 @@ const MessyLayout = (props) => {
           }}>
             {state?.layout && (
                     <ReactGridLayout
-                            layout={state.layout}
-                            onLayoutChange={(layout) => {
-                              props.onLayoutChange(layout);
-                            }}
-                            {...props}
+                            layouts={state.layout}
+                            
+                            cols={12}
                     >
-                      {_.map(_.range(props.items), function(i) {
+                      {_.map(_.range(20), function(i) {
                         return (
                                 <div key={i}>
                                   <span className="text">{i}</span>
@@ -51,14 +43,5 @@ const MessyLayout = (props) => {
           </div>
   );
 }
-
-MessyLayout.defaultProps = {
-  className: "layout",
-  cols: 12,
-  items: 20,
-  onLayoutChange: function() {
-  },
-  rowHeight: 30,
-};
 
 export default MessyLayout

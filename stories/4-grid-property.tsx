@@ -1,18 +1,18 @@
 import _ from "lodash";
 import React from "react";
-import RGL from '../lib/ReactGridLayout';
-
-const ReactGridLayout = RGL;
+import ReactGridLayout from '../lib/ResponsiveReactGridLayout';
 
 const GridPropertyLayout = (props) => {
   return (
-          <ReactGridLayout onLayoutChange={(layout) => {
-            props.onLayoutChange(layout);
-          }} {...props}>
-            {_.map(_.range(props.items), function(i) {
+          <ReactGridLayout
+                  isDraggable={true}
+                  isResizable={true}
+                  cols={12}
+          >
+            {_.map(_.range(20), function(i) {
               return (
                       <div key={i}
-                           data-grid={(_.map(new Array(props.items), function(item, i) {
+                           data-grid={(_.map(new Array(20), function(item, i) {
                              var w = _.result(props, "w") || Math.ceil(Math.random() * 4);
                              var y = _.result(props, "y") || Math.ceil(Math.random() * 4) + 1;
                              return {
@@ -30,16 +30,6 @@ const GridPropertyLayout = (props) => {
           </ReactGridLayout>
   );
 }
-
-GridPropertyLayout.defaultProps = {
-  isDraggable: true,
-  isResizable: true,
-  items: 20,
-  rowHeight: 30,
-  onLayoutChange: function() {
-  },
-  cols: 12
-};
 
 
 export default GridPropertyLayout

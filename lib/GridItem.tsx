@@ -308,21 +308,243 @@ const GridItem = (props: { layout: Layout, [x: string]: any; cols?: any; contain
     });
   }
 
+  const onResizeStop = (
+          e: Event,
+          callbackData: any
+  ) => {
+    if (!props.onResizeStop) return
+
+    const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
+
+    // Get new XY
+    let {w, h} = calcWH(
+            positionParams,
+            callbackData.size.width,
+            callbackData.size.height,
+            props.x,
+            props.y,
+            handleOrientation
+    );
+
+    // Min/max capping
+    w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
+    h = clamp(h, props.minH, props.maxH);
+
+    if (callbackData.node) {
+      let currentLeft, currentTop;
+      if (props.useCSSTransforms) {
+        const transformCSS = callbackData.node.style.transform
+                .replace(/[^\d.,]/g, "")
+                .split(",")
+        currentLeft = parseInt(transformCSS[0], 10);
+        currentTop = parseInt(transformCSS[1], 10);
+      } else {
+        currentLeft = parseInt(callbackData.node.style.left, 10);
+        currentTop = parseInt(callbackData.node.style.top, 10);
+      }
+
+      const currentWidth = callbackData.node.offsetWidth;
+      const currentHeight = callbackData.node.offsetHeight;
+
+      if (
+              [
+                "sw",
+                "w",
+                "nw",
+                // "n",
+                "ne"
+              ].indexOf(callbackData.handle) === -1
+      ) {
+        setState(prevState => ({
+          ...prevState,
+          resizing: null,
+          resizeStartPos: null,
+        }));
+      } else {
+        if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop;
+        } else if (
+                ["n", "ne"].indexOf(callbackData.handle) !== -1
+        ) {
+          callbackData.size.left = currentLeft;
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        } else {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        }
+        callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
+        callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
+      }
+      setState(prevState => ({
+        ...prevState,
+        resizing: null,
+        resizeStartPos: null,
+      }));
+    }
+
+    props.onResizeStop.call(GridItem, props.i, w, h, {
+      e,
+      node: callbackData.node,
+      size: callbackData.size,
+      handle: callbackData.handle
+    });
+  };
+
+  const onResizeStart = (
+          e: Event,
+          callbackData: any
+  ) => {
+    const newPosition = {top: 0, left: 0};
+
+    // TODO: this wont work on nested parents
+    if (!callbackData.node.offsetParent) return;
+    const parentRect = callbackData.node.offsetParent.getBoundingClientRect();
+    const clientRect = callbackData.node.getBoundingClientRect();
+    const cLeft = clientRect.left / props.transformScale;
+    const pLeft = parentRect.left / props.transformScale;
+    const cTop = clientRect.top / props.transformScale;
+    const pTop = parentRect.top / props.transformScale;
+    newPosition.left = cLeft - pLeft + callbackData.node.offsetParent.scrollLeft;
+    newPosition.top = cTop - pTop + callbackData.node.offsetParent.scrollTop;
+    newPosition.width = clientRect.width / props.transformScale
+    newPosition.height = clientRect.height / props.transformScale
+
+
+    if (!props.onResizeStart) return
+
+    const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
+
+    // Get new XY
+    let {w, h} = calcWH(
+            positionParams,
+            callbackData.size.width,
+            callbackData.size.height,
+            props.x,
+            props.y,
+            handleOrientation
+    );
+
+    // Min/max capping
+    w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
+    h = clamp(h, props.minH, props.maxH);
+
+
+    setState(prevState => ({
+      ...prevState,
+      resizing: newPosition,
+      resizeStartPos: newPosition
+    }));
+
+    props.onResizeStart.call(GridItem, props.i, w, h, {
+      e,
+      node: callbackData.node,
+      size: newPosition,
+      handle: props.handle
+    });
+  };
+
+  const onResize = (
+          e: Event,
+          callbackData: any
+  ) => {
+    if (!props.onResize) return
+
+    const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
+
+    // Get new XY
+    let {w, h} = calcWH(
+            positionParams,
+            callbackData.size.width,
+            callbackData.size.height,
+            props.x,
+            props.y,
+            handleOrientation
+    );
+
+    // Min/max capping
+    w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
+    h = clamp(h, props.minH, h);
+
+    let elem = callbackData.node.parentNode;
+    if (elem) {
+      let currentLeft, currentTop;
+      if (props.useCSSTransforms) {
+        const transformCSS = elem.style.transform
+                .replace(/[^\d.,]/g, "")
+                .split(",")
+        currentLeft = parseInt(transformCSS[0], 10);
+        currentTop = parseInt(transformCSS[1], 10);
+      } else {
+        currentLeft = parseInt(elem.style.left, 10);
+        currentTop = parseInt(elem.style.top, 10);
+      }
+
+      const currentWidth = elem.offsetWidth;
+      const currentHeight = elem.offsetHeight;
+
+      if (
+              [
+                "sw",
+                "w",
+                "nw",
+                "n",
+                "ne"
+              ].indexOf(callbackData.handle) === -1
+      ) {
+        setState(prevState => ({
+          ...prevState,
+          resizing: callbackData.size
+        }));
+      } else {
+        if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
+          // console.log(callbackData)
+          callbackData.size.left = currentLeft - callbackData.size.deltaX;
+          callbackData.size.top = currentTop;
+        } else if (
+                ["n", "ne"].indexOf(callbackData.handle) !== -1
+        ) {
+          callbackData.size.left = currentLeft;
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        } else {
+          callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
+          callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
+        }
+        callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
+        callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
+      }
+      callbackData.size.left = state.resizing + callbackData.size.deltaX
+      callbackData.size.top = state.resizing + callbackData.size.deltaY
+      setState(prevState => ({
+        ...prevState,
+        resizing: callbackData.size,
+      }));
+    }
+
+
+    props.onResize.call(GridItem, props.i, w, h, {
+      e,
+      node: elem,
+      size: callbackData.size,
+      handle: callbackData.handle
+    });
+  };
+
   return (
           // @ts-ignore
           <DraggableCore
                   disabled={!props.isDraggable}
                   onStart={(e: Event, {node}: any) => {
-                    return handleDragStart(node, e);
+                    handleDragStart(node, e);
                   }}
                   onDrag={(
                           e: Event,
                           {node, deltaX, deltaY}: { node: any, deltaX: any, deltaY: any }
                   ) => {
-                    return handleDrag(deltaY, deltaX, node, e);
+                    handleDrag(deltaY, deltaX, node, e);
                   }}
                   onStop={(e: Event, {node}: any) => {
-                    return handleDragStop(e, node);
+                    handleDragStop(e, node);
                   }}
                   handle={props.handle}
                   cancel={
@@ -346,225 +568,9 @@ const GridItem = (props: { layout: Layout, [x: string]: any; cols?: any; contain
                       Math.min(maxes.width, maxWidth),
                       Math.min(maxes.height, Infinity)
                     ]}
-                    onResizeStop={(
-                            e: Event,
-                            callbackData: any
-                    ) => {
-                      if (!props.onResizeStop) return
-
-                      const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
-
-                      // Get new XY
-                      let {w, h} = calcWH(
-                              positionParams,
-                              callbackData.size.width,
-                              callbackData.size.height,
-                              props.x,
-                              props.y,
-                              handleOrientation
-                      );
-
-                      // Min/max capping
-                      w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
-                      h = clamp(h, props.minH, props.maxH);
-
-                      if (callbackData.node) {
-                        let currentLeft, currentTop;
-                        if (props.useCSSTransforms) {
-                          const transformCSS = callbackData.node.style.transform
-                                  .replace(/[^\d.,]/g, "")
-                                  .split(",")
-                          currentLeft = parseInt(transformCSS[0], 10);
-                          currentTop = parseInt(transformCSS[1], 10);
-                        } else {
-                          currentLeft = parseInt(callbackData.node.style.left, 10);
-                          currentTop = parseInt(callbackData.node.style.top, 10);
-                        }
-
-                        const currentWidth = callbackData.node.offsetWidth;
-                        const currentHeight = callbackData.node.offsetHeight;
-
-                        if (
-                                [
-                                  "sw",
-                                  "w",
-                                  "nw",
-                                  // "n",
-                                  "ne"
-                                ].indexOf(callbackData.handle) === -1
-                        ) {
-                          setState(prevState => ({
-                            ...prevState,
-                            resizing: null,
-                            resizeStartPos: null,
-                          }));
-                        } else {
-                          if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
-                            callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
-                            callbackData.size.top = currentTop;
-                          } else if (
-                                  ["n", "ne"].indexOf(callbackData.handle) !== -1
-                          ) {
-                            callbackData.size.left = currentLeft;
-                            callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
-                          } else {
-                            callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
-                            callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
-                          }
-                          callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
-                          callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
-                        }
-                        setState(prevState => ({
-                          ...prevState,
-                          resizing: null,
-                          resizeStartPos: null,
-                        }));
-                      }
-
-                      props.onResizeStop.call(GridItem, props.i, w, h, {
-                        e,
-                        node: callbackData.node,
-                        size: callbackData.size,
-                        handle: callbackData.handle
-                      });
-                    }}
-                    onResizeStart={(
-                            e: Event,
-                            callbackData: any
-                    ) => {
-                      const newPosition = {top: 0, left: 0};
-
-                      // TODO: this wont work on nested parents
-                      if (!callbackData.node.offsetParent) return;
-                      const parentRect = callbackData.node.offsetParent.getBoundingClientRect();
-                      const clientRect = callbackData.node.getBoundingClientRect();
-                      const cLeft = clientRect.left / props.transformScale;
-                      const pLeft = parentRect.left / props.transformScale;
-                      const cTop = clientRect.top / props.transformScale;
-                      const pTop = parentRect.top / props.transformScale;
-                      newPosition.left = cLeft - pLeft + callbackData.node.offsetParent.scrollLeft;
-                      newPosition.top = cTop - pTop + callbackData.node.offsetParent.scrollTop;
-                      newPosition.width = clientRect.width / props.transformScale
-                      newPosition.height = clientRect.height / props.transformScale
-
-
-                      if (!props.onResizeStart) return
-
-                      const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
-
-                      // Get new XY
-                      let {w, h} = calcWH(
-                              positionParams,
-                              callbackData.size.width,
-                              callbackData.size.height,
-                              props.x,
-                              props.y,
-                              handleOrientation
-                      );
-
-                      // Min/max capping
-                      w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
-                      h = clamp(h, props.minH, props.maxH);
-
-
-                      setState(prevState => ({
-                        ...prevState,
-                        resizing: newPosition,
-                        resizeStartPos: newPosition
-                      }));
-
-                      props.onResizeStart.call(GridItem, props.i, w, h, {
-                        e,
-                        node: callbackData.node,
-                        size: newPosition,
-                        handle: props.handle
-                      });
-                    }}
-                    onResize={(
-                            e: Event,
-                            callbackData: any
-                    ) => {
-                      if (!props.onResize) return
-
-                      const handleOrientation = ["sw", "w", "nw"].indexOf(callbackData.handle) != -1 ? "west" : "east";
-
-                      // Get new XY
-                      let {w, h} = calcWH(
-                              positionParams,
-                              callbackData.size.width,
-                              callbackData.size.height,
-                              props.x,
-                              props.y,
-                              handleOrientation
-                      );
-
-                      // Min/max capping
-                      w = clamp(w, Math.max(props.minW, 1), handleOrientation === "west" ? Math.min(props.maxW, props.cols) : Math.min(props.maxW, props.cols - props.x));
-                      h = clamp(h, props.minH, props.maxH);
-
-                      let elem = callbackData.node.parentNode;
-                      if (elem) {
-                        let currentLeft, currentTop;
-                        if (props.useCSSTransforms) {
-                          const transformCSS = elem.style.transform
-                                  .replace(/[^\d.,]/g, "")
-                                  .split(",")
-                          currentLeft = parseInt(transformCSS[0], 10);
-                          currentTop = parseInt(transformCSS[1], 10);
-                        } else {
-                          currentLeft = parseInt(elem.style.left, 10);
-                          currentTop = parseInt(elem.style.top, 10);
-                        }
-
-                        const currentWidth = elem.offsetWidth;
-                        const currentHeight = elem.offsetHeight;
-
-                        if (
-                                [
-                                  "sw",
-                                  "w",
-                                  "nw",
-                                  "n",
-                                  "ne"
-                                ].indexOf(callbackData.handle) === -1
-                        ) {
-                          setState(prevState => ({
-                            ...prevState,
-                            resizing: callbackData.size
-                          }));
-                        } else {
-                          if (["sw", "w"].indexOf(callbackData.handle) !== -1) {
-                            // console.log(callbackData)
-                            callbackData.size.left = currentLeft - callbackData.size.deltaX;
-                            callbackData.size.top = currentTop;
-                          } else if (
-                                  ["n", "ne"].indexOf(callbackData.handle) !== -1
-                          ) {
-                            callbackData.size.left = currentLeft;
-                            callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
-                          } else {
-                            callbackData.size.left = currentLeft - (callbackData.size.width - currentWidth);
-                            callbackData.size.top = currentTop - (callbackData.size.height - currentHeight);
-                          }
-                          callbackData.size.left = callbackData.size.left < 0 ? 0 : callbackData.size.left;
-                          callbackData.size.top = callbackData.size.top < 0 ? 0 : callbackData.size.top;
-                        }
-                        callbackData.size.left = state.resizing + callbackData.size.deltaX
-                        callbackData.size.top = state.resizing + callbackData.size.deltaY
-                        setState(prevState => ({
-                          ...prevState,
-                          resizing: callbackData.size,
-                        }));
-                      }
-
-
-                      props.onResize.call(GridItem, props.i, w, h, {
-                        e,
-                        node: elem,
-                        size: callbackData.size,
-                        handle: callbackData.handle
-                      });
-                    }}
+                    onResizeStop={onResizeStop}
+                    onResizeStart={onResizeStart}
+                    onResize={onResize}
                     transformScale={props.transformScale}
                     resizeHandles={props.resizeHandles}
                     handle={props.resizeHandle}

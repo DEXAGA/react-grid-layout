@@ -1,9 +1,9 @@
 name: Deploy Node.js Package
 on:
-  release:
-    types: [ created ]
+  push:
+    branches: [ master ]
 jobs:
-  deploy-test:
+  deploy-package:
     runs-on: ubuntu-latest
     steps:
       - name: Slack Notification

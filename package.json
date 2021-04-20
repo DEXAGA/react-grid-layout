@@ -1,8 +1,12 @@
 {
   "name": "react-grid-layout-hooks",
   "version": "0.1.0",
-  "author": "Cedric McKinnie",
+  "author": "Cedric McKinnie <cedricmckinnie@dexaga.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DEXAGA/react-grid-layout-hooks.git"
+  },
   "dependencies": {
     "lodash.isequal": "^4.0.0",
     "typescript": "^4.2.3"

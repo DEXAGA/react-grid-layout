@@ -2,6 +2,8 @@ name: Deploy Node.js Package
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
 jobs:
   deploy-package:
     runs-on: ubuntu-latest

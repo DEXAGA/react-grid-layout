@@ -41,6 +41,7 @@ try {
 } catch (e) {
   /* Ignore */
 }
+
 const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLayoutChange?: any; onDragStart?: any; preventCollision?: any; onDrag?: any; onDragStop?: any; onResizeStart?: any; onResize?: any; onResizeStop?: any; width?: any; height?: any; margin?: any; maxRows?: any; rowHeight?: any; useCSSTransforms?: any; transformScale?: any; isDraggable?: any; isResizable?: any; resizeHandles?: any; isBounded?: any; draggableCancel?: any; draggableHandle?: any; resizeHandle?: any; droppingItem?: any; onDrop?: any; autoSize?: any; containerPadding?: any; innerRef?: any; className?: any; style?: any; isDroppable?: any; }) => {
 
   const containerRef = React.useRef()
@@ -48,32 +49,34 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
 
   // Generate one layout item per child.
   const layout: LayoutItem[] = [];
-  React.Children.forEach(props.children, (child, i: number) => {
-    // Don't overwrite if it already exists.
-    if (props.layout.find(((value, index) => (props.layout)[index].i === String(child.key)))) {
-      layout[i] = {
-        ...props.layout.find(((value, index) => (props.layout)[index].i === String(child.key)))
-      };
-    } else {
-      if (child.props["data-grid"] || child.props._grid) {
-        // FIXME clone not really necessary here
+  if (props.children) {
+    React.Children.forEach(props.children, (child, i: number) => {
+      // Don't overwrite if it already exists.
+      if (props.layout.find(((value, index) => (props.layout)[index].i === String(child.key)))) {
         layout[i] = {
-          ...(child.props["data-grid"] || child.props._grid),
-          i: child.key
+          ...props.layout.find(((value, index) => (props.layout)[index].i === String(child.key)))
         };
       } else {
-        // Nothing provided: ensure this is added to the bottom
-        // FIXME clone not really necessary here
-        layout[i] = {
-          w: 1,
-          h: 1,
-          x: 0,
-          y: bottom(layout),
-          i: String(child.key)
-        };
+        if (child?.props?.["data-grid"] || child?.props?._grid) {
+          // FIXME clone not really necessary here
+          layout[i] = {
+            ...(child?.props?.["data-grid"] || child?.props?._grid),
+            i: child?.key
+          };
+        } else {
+          // Nothing provided: ensure this is added to the bottom
+          // FIXME clone not really necessary here
+          layout[i] = {
+            w: 1,
+            h: 1,
+            x: 0,
+            y: bottom(layout),
+            i: String(child.key)
+          };
+        }
       }
-    }
-  });
+    });
+  }
 
   let syncedLayout = compact(correctBounds(layout, {cols: props.cols}), props.verticalCompact === false ? null : props.compactType, props.cols);
 
@@ -134,8 +137,8 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
         newLayoutBase = props.layout;
       } else {
         if (!isEqual(
-                React.Children.map(props.children, c => c.key),
-                React.Children.map(prevState.children, c => c.key)
+                React.Children.map(props.children, c => c?.key),
+                React.Children.map(prevState.children, c => c?.key)
         )) {
           // If children change, also regenerate the layout. Use our state
           // as the base in case because it may be more up to date than

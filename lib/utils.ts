@@ -540,6 +540,7 @@ export function synchronizeLayoutWithChildren(
 
   // Generate one layout item per child.
   const layout: LayoutItem[] = [];
+  if(children) {
   React.Children.forEach(children, (child, i: number) => {
     // Don't overwrite if it already exists.
     const exists = initialLayout.find(((value, index) => initialLayout[index].i === String(child.key)));
@@ -554,7 +555,7 @@ export function synchronizeLayoutWithChildren(
                 "Please use `data-grid` or add your properties directly to the `layout`."
         );
       }
-      const g = child.props["data-grid"] || child.props._grid;
+      const g = child?.props["data-grid"] || child.props?._grid;
 
       // Hey, this item has a data-grid property, use it.
       if (g) {
@@ -580,6 +581,7 @@ export function synchronizeLayoutWithChildren(
       }
     }
   });
+  }
 
   // Correct the layout.
   const correctedLayout = correctBounds(layout, {cols: cols});

@@ -55,7 +55,11 @@
     "static-server": "^3.0.0",
     "style-loader": "^1.0.0",
     "ts-loader": "^8.1.0",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "mobx": "^6.0.4",
+    "mobx-react": "^7.0.5",
+    "mobx-react-lite": "^1.4.0",
+    "mobx-utils": "^6.0.1"
   },
   "scripts": {
     "build": "esbuild index.ts --bundle --outfile=dist/bundle.js",

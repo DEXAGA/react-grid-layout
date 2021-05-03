@@ -103,15 +103,21 @@ const ResponsiveReactGridLayout = (props) => {
         );
 
         // This adds missing items.
-        layout = synchronizeLayoutWithChildren(
-                layout,
-                props.children,
-                newCols,
-                props.compactType
-        );
 
-        // Store the new layout.
-        newLayouts[newBreakpoint] = layout;
+
+        ////////////// BREAKPOINT CHANGE ISSUE HERE
+
+
+
+        // layout = synchronizeLayoutWithChildren(
+        //         layout,
+        //         props.children,
+        //         newCols,
+        //         props.compactType
+        // );
+        //
+        // // Store the new layout.
+        // newLayouts[newBreakpoint] = layout;
 
         // callbacks
         props.onLayoutChange(layout, newLayouts);

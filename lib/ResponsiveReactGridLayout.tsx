@@ -60,7 +60,6 @@ const ResponsiveReactGridLayout = (props) => {
 
   React.useEffect(() => {
     return setState(prevState => {
-      if (!isEqual(props.layouts, prevState.layouts)) {
 
         const newLayout = findOrGenerateResponsiveLayout(
                 props.layouts,
@@ -73,15 +72,10 @@ const ResponsiveReactGridLayout = (props) => {
         return ({
           ...prevState,
           layout: newLayout,
-          layouts: props.layouts
+          // layouts: props.layouts
         });
-      } else {
-        return (
-                prevState
-        )
-      }
     })
-  })
+  }, [props.breakpoints, props.compactType, props.layouts])
 
   React.useEffect(() => {
       const newBreakpoint = props.breakpoint || breakpoint;
@@ -144,7 +138,7 @@ const ResponsiveReactGridLayout = (props) => {
               newCols,
               containerPadding
       );
-  })
+  }, [breakpoint, props, props.breakpoints, props.cols, state.breakpoint, state.layout, width])
 
   // wrap layouts so we do not need to pass layouts to child
   const onLayoutChange = (layout: any) => {
@@ -160,6 +154,14 @@ const ResponsiveReactGridLayout = (props) => {
                  height: `100%`,
                  width: `100%`
                }}>
+            {/*<div>*/}
+              {/*{JSON.stringify(props.layouts)}*/}
+              {/*<br/>*/}
+              {/*{JSON.stringify(props.breakpoints)}*/}
+              {/*<br/>*/}
+              {/*{JSON.stringify(props.cols)}*/}
+              {/*{JSON.stringify(state.layout)}*/}
+            {/*</div>*/}
             {(height && width) &&(
             <ReactGridLayout
                     {...props}

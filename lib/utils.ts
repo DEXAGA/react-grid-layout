@@ -543,7 +543,7 @@ export function synchronizeLayoutWithChildren(
   if(children) {
   React.Children.forEach(children, (child, i: number) => {
     // Don't overwrite if it already exists.
-    const exists = initialLayout.find(((value, index) => initialLayout[index].i === String(child.key)));
+    const exists = initialLayout.find(((value, index) => initialLayout[index]?.i === String(child.key)));
     if (exists) {
       layout[i] = {
         ...(exists)

@@ -52,9 +52,9 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
   if (props.children) {
     React.Children.forEach(props.children, (child, i: number) => {
       // Don't overwrite if it already exists.
-      if (props.layout.find(((value, index) => (props.layout)[index].i === String(child.key)))) {
+      if (props.layout.find(((value, index) => props.layout[index]?.i === String(child.key)))) {
         layout[i] = {
-          ...props.layout.find(((value, index) => (props.layout)[index].i === String(child.key)))
+          ...props.layout.find(((value, index) => props.layout[index]?.i === String(child.key)))
         };
       } else {
         if (child?.props?.["data-grid"] || child?.props?._grid) {
@@ -90,6 +90,7 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
     droppingDOMNode: null,
     children: []
   })
+
 
   const [dragEnterCounter, setDragEnterCounter] = React.useState(0)
 
@@ -604,8 +605,8 @@ const ReactGridLayout = (props: { layout?: any; children?: any; cols: any; onLay
                     onDragOver={onDragOver}
             >
               {React.Children.map(props.children, child => {
-                        const gridItem = state.layout.find(((value, index) => (state.layout)[index].i === String(child.key)))
-                        return (child && child.key && gridItem) && (
+                        const gridItem = state.layout.find(((value, index) => (state.layout)[index].i === String(child?.key)))
+                        return (child && child?.key && gridItem) && (
                                 <GridItem
                                         layout={state.layout}
                                         nbRows={nbRow}
